@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'exif_editor_page.dart';
+import 'exif_preview_page.dart';
 
 class ExifLibrarySelectorPage extends StatelessWidget {
   static const routeName = "/exifLibrarySelector";
@@ -224,7 +224,7 @@ class ExifLibrarySelectorPage extends StatelessWidget {
 
   void _navigateToExifEditor(String libraryType) {
     Get.toNamed(
-      ExifEditorPage.routeName,
+      ExifPreviewPage.routeName,
       arguments: {
         'imagePath': imagePath,
         'libraryType': libraryType,

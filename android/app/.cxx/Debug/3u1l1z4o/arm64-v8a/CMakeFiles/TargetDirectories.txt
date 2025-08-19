@@ -1,2 +1,2 @@
-/Users/mochammadyusuffachroni/Documents/Work/Upwork/Koji ZenFuri/zenfuri/android/app/.cxx/Debug/3u1l1z4o/arm64-v8a/CMakeFiles/edit_cache.dir
-/Users/mochammadyusuffachroni/Documents/Work/Upwork/Koji ZenFuri/zenfuri/android/app/.cxx/Debug/3u1l1z4o/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/mochammadyusuffachroni/Documents/Work/Upwork/Koji Exif Editor/zenfuri/android/app/.cxx/Debug/3u1l1z4o/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/mochammadyusuffachroni/Documents/Work/Upwork/Koji Exif Editor/zenfuri/android/app/.cxx/Debug/3u1l1z4o/arm64-v8a/CMakeFiles/rebuild_cache.dir

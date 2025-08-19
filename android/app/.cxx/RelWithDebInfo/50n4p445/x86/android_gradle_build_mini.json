@@ -6,14 +6,14 @@
     [
       "/Users/mm/Library/Android/sdk/cmake/3.22.1/bin/ninja",
       "-C",
-      "/Users/mm/Documents/Work/Upwork/Koji ZenFuri/zenfuri/android/app/.cxx/RelWithDebInfo/50n4p445/x86",
+      "/Users/mm/Documents/Work/Upwork/Koji Exif Editor/zenfuri/android/app/.cxx/RelWithDebInfo/50n4p445/x86",
       "clean"
     ]
   ],
   "buildTargetsCommandComponents": [
     "/Users/mm/Library/Android/sdk/cmake/3.22.1/bin/ninja",
     "-C",
-    "/Users/mm/Documents/Work/Upwork/Koji ZenFuri/zenfuri/android/app/.cxx/RelWithDebInfo/50n4p445/x86",
+    "/Users/mm/Documents/Work/Upwork/Koji Exif Editor/zenfuri/android/app/.cxx/RelWithDebInfo/50n4p445/x86",
     "{LIST_OF_TARGETS_TO_BUILD}"
   ],
   "libraries": {}

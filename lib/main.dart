@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
         init: globalController,
         builder: (appControllerVal) {
           return GetMaterialApp(
-            title: 'ZenFuri',
+            title: 'Exif Editor',
             locale: appControllerVal.locale,
             theme: Get.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,

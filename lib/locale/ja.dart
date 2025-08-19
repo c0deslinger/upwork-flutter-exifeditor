@@ -1,5 +1,5 @@
 Map<String, String> languageJa = {
-  "apptitle": "ぜんふり",
+  "apptitle": "Exif Editor",
   "setting": "設定",
   "camera": "カメラ",
   "gallery": "ギャラリー",
@@ -106,7 +106,7 @@ Map<String, String> languageJa = {
   "app_prename_description": "写真を撮る前に自動でリネーム",
   "app_multiple_url_title": "URL一括オープナー",
   "app_multiple_url_desc": "デフォルトのブラウザ以外で複数サイトを一度に開く",
-  "app_caloriescan_title": "カロリースキャン",
+  "app_caloriescan_title": "Exif Editor",
   "app_caloriescan_desc": "写真でAIがカロリー計算するアプリ",
   "app_blindbox_title": "BlindBox_写真穴埋め問題作成",
   "app_blindbox_desc": "写真・PDFから自分で作る単語帳",

@@ -1,1 +1,1 @@
-/Users/mochammadyusuffachroni/Documents/Work/Upwork/Koji ZenFuri/zenfuri/build/app/intermediates/cxx/Debug/3u1l1z4o/obj/armeabi-v7a
+/Users/mochammadyusuffachroni/Documents/Work/Upwork/Koji Exif Editor/zenfuri/build/app/intermediates/cxx/Debug/3u1l1z4o/obj/armeabi-v7a

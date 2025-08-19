@@ -7,9 +7,10 @@ import 'package:drug_search/controllers/global_controller.dart';
 import 'package:drug_search/admob/reward_ad_controller.dart';
 
 import 'package:drug_search/views/settings/setting_page.dart';
-import 'package:drug_search/views/exif_library_selector_page.dart';
+import 'package:drug_search/views/exif_preview_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -79,7 +80,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
-    bool isFirstTimeOpen = await globalController.checkIsFirstTimeOpen();
+    // bool isFirstTimeOpen = await globalController.checkIsFirstTimeOpen();
     // if (state == AppLifecycleState.resumed && !isFirstTimeOpen) {
     //   adsController.showAppOpenAd();
     // } else {
@@ -89,11 +90,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _pickImageFromGallery() async {
     await fileController.pickImageFromGallery(
-      onPicked: (String imagePath) {
-        if (imagePath.isNotEmpty) {
+      onPicked: (XFile? image) {
+        if (image != null) {
+          // Navigate directly to ExifEditorPage with native_exif library
           Get.toNamed(
-            ExifLibrarySelectorPage.routeName,
-            arguments: imagePath,
+            ExifPreviewPage.routeName,
+            arguments: {
+              'imagePath': image.path,
+              'originalFileName': image.name,
+              'libraryType': 'native_exif',
+            },
           );
         }
       },
@@ -164,7 +170,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       Icon(
                         Icons.photo_library,
                         size: 80,
-                        color: Colors.purple.shade400,
+                        color: Theme.of(context).appBarTheme.backgroundColor,
                       ),
                       const SizedBox(height: 24),
                       Text(
@@ -172,18 +178,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         style: GoogleFonts.mPlusRounded1c(
                           fontWeight: FontWeight.bold,
                           fontSize: 28,
-                          color: Colors.purple.shade700,
+                          color: Theme.of(context).appBarTheme.backgroundColor,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        'prename_photo'.tr,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
                       Text(
                         'select_image_to_edit_exif'.tr,
                         textAlign: TextAlign.center,
@@ -192,26 +190,15 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           color: Colors.grey.shade600,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Add Image Button
-              Expanded(
-                flex: 1,
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                      const SizedBox(height: 24),
                       SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton.icon(
                           onPressed: () => _pickImageFromGallery(),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.purple,
+                            backgroundColor:
+                                Theme.of(context).appBarTheme.backgroundColor,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),

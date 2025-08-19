@@ -1,5 +1,5 @@
 Map<String, String> languageEn = {
-  "apptitle": "ZenFuri",
+  "apptitle": "Exif Editor",
   "setting": "Settings",
   "camera": "Camera",
   "gallery": "Gallery",
@@ -42,7 +42,8 @@ Map<String, String> languageEn = {
   "exif_editor": "Exif Editor",
   "prename_photo": "Prename Photo",
   "add_image_from_gallery": "Add Image from Gallery",
-  "select_image_to_edit_exif": "Select an image from your gallery to edit its EXIF data",
+  "select_image_to_edit_exif":
+      "Select an image from your gallery to edit its EXIF data",
   "current_settings": "Current Settings",
   "thumbnail": "Thumbnail",
   "orientation": "Orientation",

@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/mm/Documents/Work/Upwork/Koji ZenFuri/zenfuri/android/app/.cxx/Debug/69v305r4/arm64-v8a/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/mm/Documents/Work/Upwork/Koji Exif Editor/zenfuri/android/app/.cxx/Debug/69v305r4/arm64-v8a/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -15,7 +15,7 @@ class AppTheme {
   static final lightTheme = ThemeData(
     brightness: Brightness.light,
     appBarTheme: AppBarTheme(
-      backgroundColor: const Color(0xFFC0D4DA),
+      backgroundColor: const Color.fromARGB(255, 8, 40, 43),
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarBrightness:
@@ -24,11 +24,11 @@ class AppTheme {
             Platform.isIOS ? Brightness.light : Brightness.dark,
       ),
       titleTextStyle: GoogleFonts.mPlusRounded1c(
-          color: textColorLightMode, fontWeight: FontWeight.bold, fontSize: 20),
+          color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
       // color: const Color.fromARGB(255, 42, 178, 115),
       shadowColor: Colors.transparent,
       iconTheme: const IconThemeData(
-        color: textColorLightMode,
+        color: Colors.white,
       ),
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -42,8 +42,7 @@ class AppTheme {
       onSurface: AppColors.titleBlack, // <-- SEE HERE
     ),
     iconButtonTheme: const IconButtonThemeData(
-        style:
-            ButtonStyle(iconColor: WidgetStatePropertyAll(textColorLightMode))),
+        style: ButtonStyle(iconColor: WidgetStatePropertyAll(Colors.white))),
     hintColor: AppColors.greyBase3,
     checkboxTheme: const CheckboxThemeData(
         fillColor: WidgetStatePropertyAll(AppColors.titleBlack)),
@@ -80,7 +79,7 @@ class AppTheme {
           color: textColorLightMode, fontSize: 12, fontWeight: FontWeight.w500),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
     ),
-    cardTheme:  const CardThemeData(color: Colors.white),
+    cardTheme: const CardThemeData(color: Colors.white),
     popupMenuTheme: PopupMenuThemeData(
         color: Colors.white,
         textStyle: GoogleFonts.mPlusRounded1c(
