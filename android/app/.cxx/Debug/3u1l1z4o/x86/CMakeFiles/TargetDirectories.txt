@@ -1,0 +1,2 @@
+/Users/mochammadyusuffachroni/Documents/Work/Upwork/Koji ZenFuri/zenfuri/android/app/.cxx/Debug/3u1l1z4o/x86/CMakeFiles/edit_cache.dir
+/Users/mochammadyusuffachroni/Documents/Work/Upwork/Koji ZenFuri/zenfuri/android/app/.cxx/Debug/3u1l1z4o/x86/CMakeFiles/rebuild_cache.dir

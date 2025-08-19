@@ -1,0 +1,6 @@
+"CFBundleName" = "ZenFuri";
+"CFBundleDisplayName" = "ZenFuri";
+"NSCameraUsageDescription" = "We need access to your camera to analyze the japanese text on your image.";
+"NSPhotoLibraryAddUsageDescription" = "In order to analyze the japanese text on your photo, we need access to your photo library.";
+"NSPhotoLibraryUsageDescription" = "In order to analyze the japanese text on your photo, we need access to your photo library.";
+"NSUserTrackingUsageDescription" = "This identifier will be used to deliver personalized ads to you.";

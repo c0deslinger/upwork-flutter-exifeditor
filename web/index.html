@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="koji_exif_editor">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>koji_exif_editor</title>
+  <link rel="manifest" href="manifest.json">
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    const serviceWorkerVersion = null;
+  </script>
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js" defer></script>
+  
+  <!-- EXIF.js library for reading EXIF data -->
+  <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0/exif.min.js"></script>
+  
+  <script>
+    // EXIF reading function for web
+    window.readExifData = function(imageFile) {
+      return new Promise((resolve, reject) => {
+        if (!imageFile) {
+          reject('No file provided');
+          return;
+        }
+        
+        EXIF.getData(imageFile, function() {
+          try {
+            const result = {
+              success: true,
+              allTags: {},
+              totalTags: 0
+            };
+            
+            // Get orientation
+            const orientation = EXIF.getTag(this, "Orientation");
+            if (orientation) {
+              result.Orientation = orientation.toString();
+              result.allTags.Orientation = orientation.toString();
+            }
+            
+            // Get make and model
+            const make = EXIF.getTag(this, "Make");
+            if (make) {
+              result.Make = make;
+              result.allTags.Make = make;
+            }
+            
+            const model = EXIF.getTag(this, "Model");
+            if (model) {
+              result.Model = model;
+              result.allTags.Model = model;
+            }
+            
+            // Get date and time
+            const dateTime = EXIF.getTag(this, "DateTime");
+            if (dateTime) {
+              result.DateTime = dateTime;
+              result.allTags.DateTime = dateTime;
+            }
+            
+            const dateTimeOriginal = EXIF.getTag(this, "DateTimeOriginal");
+            if (dateTimeOriginal) {
+              result.DateTimeOriginal = dateTimeOriginal;
+              result.allTags.DateTimeOriginal = dateTimeOriginal;
+            }
+            
+            // Get exposure settings
+            const exposureTime = EXIF.getTag(this, "ExposureTime");
+            if (exposureTime) {
+              result.ExposureTime = exposureTime.toString();
+              result.allTags.ExposureTime = exposureTime.toString();
+            }
+            
+            const fNumber = EXIF.getTag(this, "FNumber");
+            if (fNumber) {
+              result.FNumber = fNumber.toString();
+              result.allTags.FNumber = fNumber.toString();
+            }
+            
+            const iso = EXIF.getTag(this, "ISOSpeedRatings");
+            if (iso) {
+              result.ISO = iso.toString();
+              result.allTags.ISO = iso.toString();
+            }
+            
+            // Get focal length
+            const focalLength = EXIF.getTag(this, "FocalLength");
+            if (focalLength) {
+              result.FocalLength = focalLength.toString();
+              result.allTags.FocalLength = focalLength.toString();
+            }
+            
+            // Get GPS data
+            const gpsLatitude = EXIF.getTag(this, "GPSLatitude");
+            if (gpsLatitude) {
+              result.GPSLatitude = gpsLatitude.toString();
+              result.allTags.GPSLatitude = gpsLatitude.toString();
+            }
+            
+            const gpsLongitude = EXIF.getTag(this, "GPSLongitude");
+            if (gpsLongitude) {
+              result.GPSLongitude = gpsLongitude.toString();
+              result.allTags.GPSLongitude = gpsLongitude.toString();
+            }
+            
+            // Get image dimensions
+            const imageWidth = EXIF.getTag(this, "ImageWidth");
+            if (imageWidth) {
+              result.ImageWidth = imageWidth.toString();
+              result.allTags.ImageWidth = imageWidth.toString();
+            }
+            
+            const imageLength = EXIF.getTag(this, "ImageLength");
+            if (imageLength) {
+              result.ImageLength = imageLength.toString();
+              result.allTags.ImageLength = imageLength.toString();
+            }
+            
+            // Get software
+            const software = EXIF.getTag(this, "Software");
+            if (software) {
+              result.Software = software;
+              result.allTags.Software = software;
+            }
+            
+            // Get artist
+            const artist = EXIF.getTag(this, "Artist");
+            if (artist) {
+              result.Artist = artist;
+              result.allTags.Artist = artist;
+            }
+            
+            // Get copyright
+            const copyright = EXIF.getTag(this, "Copyright");
+            if (copyright) {
+              result.Copyright = copyright;
+              result.allTags.Copyright = copyright;
+            }
+            
+            result.totalTags = Object.keys(result.allTags).length;
+            resolve(result);
+            
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
+    };
+  </script>
+</head>
+<body>
+  <script>
+    window.addEventListener('load', function(ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
