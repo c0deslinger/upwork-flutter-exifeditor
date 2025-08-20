@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:drug_search/exif_utils.dart';
 import 'package:drug_search/views/exif_info_page.dart';
-import 'package:drug_search/views/exif_editor_page.dart';
 import 'package:native_exif/native_exif.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image/image.dart' as img;
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 
 class ExifPreviewPage extends StatefulWidget {
   static const routeName = "/exifPreview";
@@ -16,13 +19,15 @@ class ExifPreviewPage extends StatefulWidget {
 }
 
 class _ExifPreviewPageState extends State<ExifPreviewPage> {
-  String? imagePath;
+  List<String> imagePaths = [];
+  List<String> originalFileNames = [];
   String? libraryType;
-  String? originalFileName;
-  Map<String, dynamic>? exifData;
-  String orientation = "Normal";
-  int orientationValue = 1; // Add orientation value as integer
+  List<Map<String, dynamic>> exifDataList = [];
+  List<String> orientations = [];
+  List<int> orientationValues = [];
+  List<double> currentRotations = [];
   bool isLoading = true;
+  Set<int> selectedIndices = {};
 
   @override
   void initState() {
@@ -30,12 +35,13 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
     // Get the arguments from navigation
     final arguments = Get.arguments as Map<String, dynamic>?;
     if (arguments != null) {
-      imagePath = arguments['imagePath'] as String?;
+      imagePaths = List<String>.from(arguments['imagePaths'] ?? []);
+      originalFileNames =
+          List<String>.from(arguments['originalFileNames'] ?? []);
       libraryType = arguments['libraryType'] as String?;
-      originalFileName = arguments['originalFileName'] as String?;
     }
 
-    if (imagePath != null && libraryType != null) {
+    if (imagePaths.isNotEmpty && libraryType != null) {
       _loadExifData();
     } else {
       setState(() {
@@ -45,80 +51,44 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
   }
 
   Future<void> _loadExifData() async {
-    if (imagePath == null || libraryType == null) return;
+    if (imagePaths.isEmpty || libraryType == null) return;
 
     try {
-      final File imageFile = File(imagePath!);
+      exifDataList.clear();
+      orientations.clear();
+      orientationValues.clear();
 
-      debugPrint('Reading EXIF data using library: $libraryType');
-      Map<String, dynamic> exifDataMap = {};
+      for (int i = 0; i < imagePaths.length; i++) {
+        final File imageFile = File(imagePaths[i]);
+        debugPrint(
+            'Reading EXIF data for image ${i + 1}/${imagePaths.length} using library: $libraryType');
 
-      switch (libraryType) {
-        case 'native_exif':
-          debugPrint('Using Native EXIF library...');
-          exifDataMap = await _readWithNativeExif(imageFile);
-          break;
-        default:
-          debugPrint('Unknown library type: $libraryType');
-          exifDataMap = {};
+        Map<String, dynamic> exifDataMap =
+            await ExifUtils.readWithNativeExif(imageFile);
+
+        debugPrint('EXIF data loaded successfully for image ${i + 1}');
+        debugPrint('Total EXIF tags found: ${exifDataMap.length}');
+
+        String detectedOrientation = ExifUtils.getOrientationText(exifDataMap);
+        int detectedOrientationValue =
+            ExifUtils.getOrientationValue(exifDataMap);
+        double rotationAngle =
+            ExifUtils.getRotationAngle(detectedOrientationValue);
+
+        debugPrint('=== ORIENTATION INFO for image ${i + 1} ===');
+        debugPrint('Orientation Text: $detectedOrientation');
+        debugPrint('Orientation Value: $detectedOrientationValue');
+        debugPrint('Rotation Angle: $rotationAngle');
+
+        exifDataList.add(exifDataMap);
+        orientations.add(detectedOrientation);
+        orientationValues.add(detectedOrientationValue);
+        // currentRotations.add(0.0); // Initialize rotation to 0
+        currentRotations
+            .add(ExifUtils.getRotationAngle(detectedOrientationValue));
       }
-
-      debugPrint('EXIF data loaded successfully');
-      debugPrint('Total EXIF tags found: ${exifDataMap.length}');
-
-      String detectedOrientation = _getOrientationText(exifDataMap);
-      int detectedOrientationValue = _getOrientationValue(exifDataMap);
-
-      debugPrint('=== ORIENTATION INFO ===');
-      debugPrint('Orientation Text: $detectedOrientation');
-      debugPrint('Orientation Value: $detectedOrientationValue');
-
-      // Calculate rotation info for debugging
-      double rotationAngle = 0.0;
-      bool needsHorizontalMirror = false;
-      bool needsVerticalMirror = false;
-
-      switch (detectedOrientationValue) {
-        case 1:
-          rotationAngle = 0.0;
-          break;
-        case 2:
-          rotationAngle = 0.0;
-          needsHorizontalMirror = true;
-          break;
-        case 3:
-          rotationAngle = 180.0;
-          break;
-        case 4:
-          rotationAngle = 0.0;
-          needsVerticalMirror = true;
-          break;
-        case 5:
-          rotationAngle = -270.0;
-          needsHorizontalMirror = true;
-          break;
-        case 6:
-          rotationAngle = -90.0; // Use same value as _getRotationAngle()
-          break;
-        case 7:
-          rotationAngle = -90.0;
-          needsHorizontalMirror = true;
-          break;
-        case 8:
-          rotationAngle = -270.0;
-          break;
-        default:
-          rotationAngle = 0.0;
-      }
-
-      debugPrint('Rotation Angle: $rotationAngle°');
-      debugPrint('Needs Horizontal Mirror: $needsHorizontalMirror');
-      debugPrint('Needs Vertical Mirror: $needsVerticalMirror');
 
       setState(() {
-        exifData = exifDataMap;
-        orientation = detectedOrientation;
-        orientationValue = detectedOrientationValue;
         isLoading = false;
       });
     } catch (e) {
@@ -129,321 +99,19 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
     }
   }
 
-  // Read EXIF data using native_exif package
-  Future<Map<String, dynamic>> _readWithNativeExif(File imageFile) async {
-    try {
-      final exifData = await Exif.fromPath(imageFile.path);
-      final attributes = await exifData.getAttributes();
-
-      debugPrint('=== Native EXIF Results ===');
-      debugPrint('Total attributes found: ${attributes?.length ?? 0}');
-
-      // Try to get orientation specifically
-      try {
-        final orientation = await exifData.getAttribute('Orientation');
-        debugPrint('Native EXIF Orientation: $orientation');
-      } catch (e) {
-        debugPrint('Could not get orientation from native_exif: $e');
-      }
-
-      attributes?.forEach((key, value) {
-        debugPrint('EXIF Tag: $key = $value (Type: ${value.runtimeType})');
-      });
-
-      return attributes ?? {};
-    } catch (e) {
-      debugPrint('Error reading with native_exif: $e');
-      return {};
-    }
-  }
-
-  int _getOrientationValue(Map<String, dynamic>? exifData) {
-    if (exifData == null || exifData.isEmpty) {
-      debugPrint('No EXIF data available for orientation value');
-      return 1; // Default to normal orientation
-    }
-
-    // Try different possible keys for orientation
-    dynamic orientationValue;
-
-    // Try different possible keys - order matters, try most common first
-    final possibleKeys = [
-      'Image Orientation',
-      'Orientation',
-      'EXIF Orientation',
-      'IFD0 Orientation',
-      'Image:Orientation',
-      'IFD0:Orientation',
-      'orientation',
-      'ORIENTATION',
-      'Orientation',
-    ];
-
-    for (String key in possibleKeys) {
-      if (exifData.containsKey(key)) {
-        orientationValue = exifData[key];
-        debugPrint('Found orientation tag with key: $key = $orientationValue');
-        break;
-      }
-    }
-
-    if (orientationValue == null) {
-      debugPrint('No orientation tag found in EXIF data');
-      return 1; // Default to normal orientation
-    }
-
-    // Convert to integer for comparison
-    int? orientationInt;
-    try {
-      // Try to parse as integer
-      if (orientationValue is int) {
-        orientationInt = orientationValue;
-      } else if (orientationValue is String) {
-        // Try to parse as integer first
-        orientationInt = int.tryParse(orientationValue);
-        debugPrint('Parsed orientation integer from string: $orientationInt');
-
-        // If that fails, try to extract number from string
-        if (orientationInt == null) {
-          final numberMatch = RegExp(r'\d+').firstMatch(orientationValue);
-          if (numberMatch != null) {
-            final group = numberMatch.group(0);
-            if (group != null) {
-              orientationInt = int.tryParse(group);
-              debugPrint(
-                  'Extracted orientation integer from string: $orientationInt');
-            }
-          }
-        }
-
-        // If still null, try to match common orientation strings
-        if (orientationInt == null) {
-          final lowerValue = orientationValue.toLowerCase();
-          if (lowerValue.contains('90') && lowerValue.contains('cw')) {
-            orientationInt = 6; // Rotate 90 CW
-          } else if (lowerValue.contains('180')) {
-            orientationInt = 3; // Rotate 180
-          } else if (lowerValue.contains('270') && lowerValue.contains('cw')) {
-            orientationInt = 8; // Rotate 270 CW
-          }
-          debugPrint('Matched orientation string to integer: $orientationInt');
-        }
-      } else {
-        orientationInt = int.tryParse(orientationValue.toString());
-        debugPrint('Parsed orientation integer from toString: $orientationInt');
-      }
-
-      debugPrint('Final parsed orientation integer: $orientationInt');
-    } catch (e) {
-      debugPrint('Error parsing orientation value: $e');
-      return 1; // Default to normal orientation
-    }
-
-    if (orientationInt == null) {
-      debugPrint('Could not parse orientation value: $orientationValue');
-      return 1; // Default to normal orientation
-    }
-
-    // Validate orientation value
-    if (orientationInt >= 1 && orientationInt <= 8) {
-      return orientationInt;
-    } else {
-      debugPrint('Invalid orientation value: $orientationInt, defaulting to 1');
-      return 1; // Default to normal orientation
-    }
-  }
-
-  String _getOrientationText(Map<String, dynamic>? exifData) {
-    if (exifData == null || exifData.isEmpty) {
-      debugPrint('No EXIF data available');
-      return "Normal";
-    }
-
-    // Debug: Print all available EXIF tags
-    debugPrint('Available EXIF tags: ${exifData.keys.toList()}');
-
-    // Try different possible keys for orientation
-    dynamic orientationValue;
-
-    // Try different possible keys - order matters, try most common first
-    final possibleKeys = [
-      'Image Orientation',
-      'Orientation',
-      'EXIF Orientation',
-      'IFD0 Orientation',
-      'Image:Orientation',
-      'IFD0:Orientation',
-      'orientation',
-      'ORIENTATION',
-      'Orientation',
-    ];
-
-    for (String key in possibleKeys) {
-      if (exifData.containsKey(key)) {
-        orientationValue = exifData[key];
-        debugPrint('Found orientation tag with key: $key = $orientationValue');
-        break;
-      }
-    }
-
-    if (orientationValue == null) {
-      debugPrint('No orientation tag found in EXIF data');
-      return "Normal";
-    }
-
-    // Convert to integer for comparison
-    int? orientationInt;
-    try {
-      // Try to parse as integer
-      if (orientationValue is int) {
-        orientationInt = orientationValue;
-      } else if (orientationValue is String) {
-        // Try to parse as integer first
-        orientationInt = int.tryParse(orientationValue);
-        debugPrint('Parsed orientation integer from string: $orientationInt');
-
-        // If that fails, try to extract number from string
-        if (orientationInt == null) {
-          final numberMatch = RegExp(r'\d+').firstMatch(orientationValue);
-          if (numberMatch != null) {
-            final group = numberMatch.group(0);
-            if (group != null) {
-              orientationInt = int.tryParse(group);
-              debugPrint(
-                  'Extracted orientation integer from string: $orientationInt');
-            }
-          }
-        }
-
-        // If still null, try to match common orientation strings
-        if (orientationInt == null) {
-          final lowerValue = orientationValue.toLowerCase();
-          if (lowerValue.contains('90') && lowerValue.contains('cw')) {
-            orientationInt = 6; // Rotate 90 CW
-          } else if (lowerValue.contains('180')) {
-            orientationInt = 3; // Rotate 180
-          } else if (lowerValue.contains('270') && lowerValue.contains('cw')) {
-            orientationInt = 8; // Rotate 270 CW
-          }
-          debugPrint('Matched orientation string to integer: $orientationInt');
-        }
-      } else {
-        orientationInt = int.tryParse(orientationValue.toString());
-        debugPrint('Parsed orientation integer from toString: $orientationInt');
-      }
-
-      debugPrint('Final parsed orientation integer: $orientationInt');
-    } catch (e) {
-      debugPrint('Error parsing orientation value: $e');
-      return "Normal";
-    }
-
-    if (orientationInt == null) {
-      debugPrint('Could not parse orientation value: $orientationValue');
-      return "Normal";
-    }
-
-    switch (orientationInt) {
-      case 1:
-        return "Normal";
-      case 2:
-        return "Mirror Horizontal";
-      case 3:
-        return "Rotate 180";
-      case 4:
-        return "Mirror Vertical";
-      case 5:
-        return "Mirror Horizontal and Rotate 270 CW";
-      case 6:
-        return "Rotate 90 CW";
-      case 7:
-        return "Mirror Horizontal and Rotate 90 CW";
-      case 8:
-        return "Rotate 270 CW";
-      default:
-        debugPrint('Unknown orientation value: $orientationInt');
-        return "Normal";
-    }
-  }
-
-  // Calculate rotation angle based on EXIF orientation
-  double _getRotationAngle() {
-    double angle = 0.0;
-    switch (orientationValue) {
-      case 1:
-        angle = 0.0; // Normal
-        break;
-      case 2:
-        angle = 0.0; // Mirror Horizontal (no rotation, just mirror)
-        break;
-      case 3:
-        angle = 180.0; // Rotate 180
-        break;
-      case 4:
-        angle = 0.0; // Mirror Vertical (no rotation, just mirror)
-        break;
-      case 5:
-        angle =
-            -270.0; // Mirror Horizontal and Rotate 270 CW (negative for clockwise in Flutter)
-        break;
-      case 6:
-        angle = -90.0; // Rotate 90 CW (negative for clockwise in Flutter)
-        break;
-      case 7:
-        angle =
-            -90.0; // Mirror Horizontal and Rotate 90 CW (negative for clockwise in Flutter)
-        break;
-      case 8:
-        angle = -270.0; // Rotate 270 CW (negative for clockwise in Flutter)
-        break;
-      default:
-        angle = 0.0; // Default to normal
-    }
-
-    debugPrint('=== TRANSFORM DEBUG ===');
-    debugPrint('Orientation Value: $orientationValue');
-    debugPrint('Rotation Angle: $angle°');
-    debugPrint('Needs Horizontal Mirror: ${_needsHorizontalMirror()}');
-    debugPrint('Needs Vertical Mirror: ${_needsVerticalMirror()}');
-
-    return angle;
-  }
-
-  // Check if image needs horizontal mirroring
-  bool _needsHorizontalMirror() {
-    switch (orientationValue) {
-      case 2:
-      case 5:
-      case 7:
-        return true;
-      default:
-        return false;
-    }
-  }
-
-  // Check if image needs vertical mirroring
-  bool _needsVerticalMirror() {
-    switch (orientationValue) {
-      case 4:
-        return true;
-      default:
-        return false;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (imagePath == null) {
+    if (imagePaths.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Exif Editor'),
+          title: const Text('Thumbnail'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Get.back(),
           ),
         ),
         body: const Center(
-          child: Text('No image selected'),
+          child: Text('No images selected'),
         ),
       );
     }
@@ -451,7 +119,9 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'exif_editor'.tr,
+          selectedIndices.isNotEmpty
+              ? 'Selected ${selectedIndices.length} images'
+              : 'Thumbnail',
           style: GoogleFonts.mPlusRounded1c(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -463,180 +133,492 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
           onPressed: () => Get.back(),
         ),
         actions: [
-          // EXIF Info button
-          if (exifData != null && exifData!.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.info_outline),
-              onPressed: () {
-                Get.toNamed(ExifInfoPage.routeName, arguments: {
-                  'imagePath': imagePath,
-                  'originalFileName': originalFileName,
-                  'exifData': exifData,
-                  'orientation': orientation,
-                  'orientationValue': orientationValue,
-                });
-              },
-              tooltip: 'View EXIF Info',
+          IconButton(
+            icon: Icon(
+              selectedIndices.length == imagePaths.length
+                  ? Icons.check_box
+                  : Icons.check_box_outline_blank,
             ),
+            onPressed: () {
+              setState(() {
+                if (selectedIndices.length == imagePaths.length) {
+                  // Deselect all
+                  selectedIndices.clear();
+                } else {
+                  // Select all
+                  selectedIndices = Set<int>.from(
+                    List.generate(imagePaths.length, (index) => index),
+                  );
+                }
+              });
+            },
+            tooltip: selectedIndices.length == imagePaths.length
+                ? 'Deselect All'
+                : 'Select All',
+          ),
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Main Image Preview
-            Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Transform.rotate(
-                    angle: _getRotationAngle() *
-                        3.14159 /
-                        180.0, // Convert degrees to radians
-                    child: Transform.scale(
-                      scaleX: _needsHorizontalMirror() ? -1.0 : 1.0,
-                      scaleY: _needsVerticalMirror() ? -1.0 : 1.0,
-                      child: Image.file(
-                        File(imagePath!),
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: Icon(
-                              Icons.error,
-                              size: 50,
-                              color: Colors.red,
-                            ),
-                          );
-                        },
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Column(
+                children: [
+                  // Grid of images
+                  Expanded(
+                    child: GridView.builder(
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 0.8,
                       ),
+                      itemCount: imagePaths.length,
+                      itemBuilder: (context, index) {
+                        return _buildImageGridItem(index);
+                      },
                     ),
                   ),
-                  // child: Image.file(
-                  //   File(imagePath!),
-                  //   fit: BoxFit.contain,
-                  //   errorBuilder: (context, error, stackTrace) {
-                  //     return const Center(
-                  //       child: Icon(
-                  //         Icons.error,
-                  //         size: 50,
-                  //         color: Colors.red,
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
-                ),
-              ),
-            ),
 
-            // Thumbnail and Orientation Section
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Row(
-                children: [
-                  // Thumbnail
-                  GestureDetector(
-                    onTap: () {
-                      Get.toNamed(ExifEditorPage.routeName, arguments: {
-                        'imagePath': imagePath,
-                        'orientation': orientation,
-                        'orientationValue': orientationValue,
-                        'originalFileName': originalFileName,
-                      });
-                    },
-                    child: Container(
-                      width: 56,
-                      height: 56,
+                  // Control panel for batch operations
+                  if (selectedIndices.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey.shade300),
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade200),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Stack(
-                          children: [
-                            Image.file(
-                              File(imagePath!),
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Center(
-                                  child: Icon(
-                                    Icons.error,
-                                    size: 20,
-                                    color: Colors.red,
-                                  ),
-                                );
-                              },
-                            ),
-                            // Overlay to indicate it's clickable
-                            Positioned.fill(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.black.withOpacity(0.1),
+                      child: Column(
+                        children: [
+                          // // Current rotation info
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //   children: [
+                          //     Text(
+                          //       'Current Rotation:',
+                          //       style: GoogleFonts.mPlusRounded1c(
+                          //         fontWeight: FontWeight.bold,
+                          //         fontSize: 14,
+                          //       ),
+                          //     ),
+                          //     Text(
+                          //       '0.0°',
+                          //       style: TextStyle(
+                          //         fontSize: 14,
+                          //         color: Colors.grey.shade700,
+                          //         fontWeight: FontWeight.w500,
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
+                          // const SizedBox(height: 16),
+
+                          // Rotate button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _rotateSelectedImages,
+                              icon: const Icon(Icons.rotate_right),
+                              label: Text(
+                                'Rotate 90° Clockwise',
+                                style: GoogleFonts.mPlusRounded1c(
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.edit,
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
                             ),
-                          ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Save button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _saveSelectedImages,
+                              icon: const Icon(Icons.save),
+                              label: Text(
+                                'Save Images',
+                                style: GoogleFonts.mPlusRounded1c(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildImageGridItem(int index) {
+    final imagePath = imagePaths[index];
+    final fileName = originalFileNames[index];
+    final exifData = exifDataList[index];
+    final orientation = orientations[index];
+    final orientationValue = orientationValues[index];
+    final isSelected = selectedIndices.contains(index);
+
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(ExifInfoPage.routeName, arguments: {
+          'imagePath': imagePath,
+          'exifData': exifData,
+          'orientation': orientation,
+          'orientationValue': orientationValue,
+          'originalFileName': fileName,
+        });
+      },
+      child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isSelected ? Colors.green : Colors.grey.shade300,
+              width: isSelected ? 2 : 1,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  // Image Preview
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(8)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(8)),
+                        child: Transform.rotate(
+                          // angle: (ExifUtils.getRotationAngle(orientationValue) +
+                          //         currentRotations[index]) *
+                          angle: (currentRotations[index]) * 3.14159 / 180.0,
+                          child: Transform.scale(
+                            scaleX: ExifUtils.needsHorizontalMirror(
+                                    orientationValue)
+                                ? -1.0
+                                : 1.0,
+                            scaleY:
+                                ExifUtils.needsVerticalMirror(orientationValue)
+                                    ? -1.0
+                                    : 1.0,
+                            child: GestureDetector(
+                              onTap: () {},
+                              child: Image.file(
+                                File(imagePath),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Center(
+                                    child: Icon(
+                                      Icons.error,
+                                      size: 30,
+                                      color: Colors.red,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
 
-                  // Thumbnail Info
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'thumbnail'.tr,
-                        style: GoogleFonts.mPlusRounded1c(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                  // Image Info (Compact)
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // File name
+                        Text(
+                          fileName,
+                          style: GoogleFonts.mPlusRounded1c(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${'orientation'.tr}: $orientation (Value: $orientationValue)',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
+                        const SizedBox(height: 4),
+
+                        // Orientation value
+                        Text(
+                          orientation,
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 10,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Rotation: ${_getRotationAngle()}°',
-                        style: TextStyle(
-                          color: Colors.grey.shade500,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
+
+              // Selection checkbox
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      if (isSelected) {
+                        selectedIndices.remove(index);
+                      } else {
+                        selectedIndices.add(index);
+                      }
+                    });
+                  },
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.green : Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(
+                        color: isSelected ? Colors.green : Colors.grey.shade400,
+                        width: 2,
+                      ),
+                    ),
+                    child: isSelected
+                        ? const Icon(
+                            Icons.check,
+                            size: 16,
+                            color: Colors.white,
+                          )
+                        : null,
+                  ),
+                ),
+              ),
+            ],
+          )),
+    );
+  }
+
+  void _rotateSelectedImages() {
+    if (selectedIndices.isEmpty) return;
+    _performBatchRotation();
+  }
+
+  void _performBatchRotation() {
+    setState(() {
+      for (int index in selectedIndices) {
+        currentRotations[index] += 90.0;
+        // Keep rotation between 0 and 360 degrees
+        if (currentRotations[index] >= 360) {
+          currentRotations[index] -= 360;
+        }
+      }
+    });
+  }
+
+  Future<void> _saveSelectedImages() async {
+    if (selectedIndices.isEmpty) return;
+
+    // Show rename dialog with multiple text fields
+    final List<TextEditingController> nameControllers = [];
+    final List<String> selectedFileNames = [];
+
+    for (int index in selectedIndices) {
+      nameControllers.add(TextEditingController(
+        text: originalFileNames[index],
+      ));
+      selectedFileNames.add(originalFileNames[index]);
+    }
+
+    final List<String>? newFileNames = await Get.dialog<List<String>>(
+      AlertDialog(
+        title: Center(
+          child: Text(
+            'Save Rotated Images',
+            style: GoogleFonts.mPlusRounded1c(
+              fontWeight: FontWeight.normal,
             ),
-          ],
+          ),
         ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...List.generate(selectedIndices.length, (i) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: nameControllers[i],
+                        decoration: InputDecoration(
+                          labelText: 'Image ${i + 1} Name',
+                          hintText: 'Enter image name',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        textCapitalization: TextCapitalization.words,
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final fileNames = nameControllers
+                  .map((controller) => controller.text.trim())
+                  .where((name) => name.isNotEmpty)
+                  .toList();
+
+              if (fileNames.length == selectedIndices.length) {
+                Get.back(result: fileNames);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(
+              'Save All',
+              style: GoogleFonts.mPlusRounded1c(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
+
+    // If user cancelled the dialog, return
+    if (newFileNames == null) {
+      return;
+    }
+
+    try {
+      int successCount = 0;
+      int totalCount = selectedIndices.length;
+
+      // Process each selected image
+      for (int i = 0; i < selectedIndices.length; i++) {
+        final index = selectedIndices.elementAt(i);
+        final imagePath = imagePaths[index];
+        final fileName = newFileNames[i];
+
+        try {
+          // Read the original image
+          final File originalFile = File(imagePath);
+          if (!await originalFile.exists()) {
+            continue;
+          }
+
+          final Uint8List imageBytes = await originalFile.readAsBytes();
+          final img.Image? originalImage = img.decodeImage(imageBytes);
+          if (originalImage == null) {
+            continue;
+          }
+
+          // Apply rotation transformation
+          debugPrint(
+              'Rotating image $index by ${currentRotations[index]} degrees currentRotations[$index]: ${currentRotations[index]}');
+          img.Image rotatedImage = originalImage;
+          if (currentRotations[index] != 0) {
+            rotatedImage = img.copyRotate(originalImage,
+                angle: currentRotations[index].toInt());
+          }
+
+          // Encode the image
+          final Uint8List encodedImage =
+              img.encodeJpg(rotatedImage, quality: 95);
+
+          // Save to gallery
+          final result = await ImageGallerySaverPlus.saveImage(
+            encodedImage,
+            quality: 95,
+            name: fileName,
+          );
+
+          if (result['isSuccess'] == true) {
+            successCount++;
+          }
+        } catch (e) {
+          print('Error saving image $index: $e');
+        }
+      }
+      // // Show result
+      if (successCount == totalCount) {
+        Get.snackbar(
+          'Success',
+          'All $successCount image(s) saved to gallery successfully!',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+        );
+      } else {
+        Get.snackbar(
+          'Partial Success',
+          '$successCount of $totalCount image(s) saved successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+        );
+      }
+
+      // Clear selection after saving
+      setState(() {
+        selectedIndices.clear();
+      });
+    } catch (e) {
+      print('Error in batch save: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to save images: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 5),
+      );
+    }
   }
 }

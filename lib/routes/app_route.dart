@@ -21,9 +21,9 @@ class AppRoute {
         name: ExifPreviewPage.routeName, page: () => const ExifPreviewPage()),
     GetPage(name: ExifInfoPage.routeName, page: () => const ExifInfoPage()),
     GetPage(name: ExifEditorPage.routeName, page: () => const ExifEditorPage()),
-    GetPage(
-        name: ExifLibrarySelectorPage.routeName,
-        page: () => ExifLibrarySelectorPage(imagePath: Get.arguments)),
+    // GetPage(
+    //     name: ExifLibrarySelectorPage.routeName,
+    //     page: () => ExifLibrarySelectorPage(imagePath: Get.arguments)),
     GetPage(
         name: UpgradeSubsPage.routeName, page: () => const UpgradeSubsPage()),
     // GetPage(name: UpgradePage.routeName, page: () => UpgradePage()),

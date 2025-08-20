@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -283,6 +285,30 @@ class _ExifInfoPageState extends State<ExifInfoPage> {
                 ],
               ),
             ),
+
+            Transform.rotate(
+              angle: (_getRotationAngle()) * 3.14159 / 180.0,
+              child: Transform.scale(
+                scaleX: _needsHorizontalMirror() ? -1.0 : 1.0,
+                scaleY: _needsVerticalMirror() ? -1.0 : 1.0,
+                child: Image.file(
+                  File(imagePath!),
+                  fit: BoxFit.cover,
+                  width: 200,
+                  height: 200,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Center(
+                      child: Icon(
+                        Icons.error,
+                        size: 30,
+                        color: Colors.red,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
 
             // Thumbnail and main content
             Expanded(

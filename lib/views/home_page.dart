@@ -88,16 +88,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // }
   }
 
-  Future<void> _pickImageFromGallery() async {
-    await fileController.pickImageFromGallery(
-      onPicked: (XFile? image) {
-        if (image != null) {
-          // Navigate directly to ExifEditorPage with native_exif library
+  Future<void> _pickImagesFromGallery() async {
+    await fileController.pickMultipleImagesFromGallery(
+      onPicked: (List<XFile> images) {
+        if (images.isNotEmpty) {
+          // Navigate to ExifPreviewPage with multiple images
           Get.toNamed(
             ExifPreviewPage.routeName,
             arguments: {
-              'imagePath': image.path,
-              'originalFileName': image.name,
+              'imagePaths': images.map((img) => img.path).toList(),
+              'originalFileNames': images.map((img) => img.name).toList(),
               'libraryType': 'native_exif',
             },
           );
@@ -195,7 +195,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton.icon(
-                          onPressed: () => _pickImageFromGallery(),
+                          onPressed: () => _pickImagesFromGallery(),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 Theme.of(context).appBarTheme.backgroundColor,
@@ -207,7 +207,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                           icon: const Icon(Icons.add_photo_alternate, size: 24),
                           label: Text(
-                            'add_image_from_gallery'.tr,
+                            'Select Multiple Images'.tr,
                             style: GoogleFonts.mPlusRounded1c(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,

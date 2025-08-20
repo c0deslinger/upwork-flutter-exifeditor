@@ -19,9 +19,9 @@ class AppTheme {
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarBrightness:
-            Platform.isIOS ? Brightness.light : Brightness.dark,
+            !Platform.isIOS ? Brightness.dark : Brightness.dark,
         statusBarIconBrightness:
-            Platform.isIOS ? Brightness.light : Brightness.dark,
+            !Platform.isIOS ? Brightness.light : Brightness.dark,
       ),
       titleTextStyle: GoogleFonts.mPlusRounded1c(
           color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),

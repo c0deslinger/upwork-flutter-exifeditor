@@ -27,6 +27,22 @@ class FileController extends GetxController {
     onPicked(image);
   }
 
+  Future<void> pickMultipleImagesFromGallery(
+      {required Function(List<XFile>) onPicked}) async {
+    final List<XFile> images = await _picker.pickMultiImage();
+    if (images.isEmpty) {
+      // User cancelled picking images
+      onPicked([]);
+      return;
+    }
+    debugPrint('Selected ${images.length} images');
+    for (var image in images) {
+      debugPrint('image.path: ${image.path}');
+      debugPrint('image.name: ${image.name}');
+    }
+    onPicked(images);
+  }
+
   Future<void> pickImageFromCamera(
       {required Function(String) onCaptured}) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
