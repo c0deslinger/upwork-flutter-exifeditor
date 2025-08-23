@@ -3,6 +3,7 @@ import 'package:drug_search/theme/app_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get_storage/get_storage.dart';
 
 class GlobalController extends GetxController {
   Locale locale = const Locale("en");
@@ -18,6 +19,9 @@ class GlobalController extends GetxController {
   bool isFirstTimeOpen = false;
   DateTime? lastShowReview; // Variabel untuk menyimpan tanggal terakhir review
   String currency = "usd";
+  String? savedZip;
+  final box = GetStorage();
+  String? savedPath;
 
   @override
   void onInit() {
@@ -106,6 +110,8 @@ class GlobalController extends GetxController {
     isDarkMode = storedIsDarkMode ?? false;
     isVertical = storedIsVertical ?? false;
     currency = storedCurrency ?? "usd";
+    getSavedZip();
+    getSavedPath();
 
     // Update bahasa dan tema
     Get.updateLocale(locale);
@@ -227,5 +233,23 @@ class GlobalController extends GetxController {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     isFirstTimeOpen = prefs.getBool("isFirstTimeOpen") ?? true;
     return isFirstTimeOpen;
+  }
+
+  Future<String?> getSavedZip() async {
+    savedZip = box.read("savedZip");
+    update();
+    return savedZip;
+  }
+
+  Future<void> setSavedPath({required String path}) async {
+    box.write("savedPath", path);
+    savedPath = path;
+    update();
+  }
+
+  Future<String?> getSavedPath() async {
+    savedPath = box.read("savedPath");
+    update();
+    return savedPath;
   }
 }

@@ -2,12 +2,12 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:drug_search/exif_utils.dart';
 import 'package:drug_search/views/exif_info_page.dart';
-import 'package:native_exif/native_exif.dart';
+import 'package:drug_search/utils/album_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image/image.dart' as img;
-import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ExifPreviewPage extends StatefulWidget {
   static const routeName = "/exifPreview";
@@ -570,15 +570,28 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
           final Uint8List encodedImage =
               img.encodeJpg(rotatedImage, quality: 95);
 
-          // Save to gallery
-          final result = await ImageGallerySaverPlus.saveImage(
-            encodedImage,
-            quality: 95,
-            name: fileName,
-          );
+          // Save the encoded image to a temporary file
+          final Directory tempDir = await getTemporaryDirectory();
+          final String tempPath =
+              '${tempDir.path}/temp_${DateTime.now().millisecondsSinceEpoch}_$index.jpg';
+          final File tempFile = File(tempPath);
+          await tempFile.writeAsBytes(encodedImage);
 
-          if (result['isSuccess'] == true) {
+          // Save to gallery using AlbumSaver
+          try {
+            if (Platform.isAndroid) {
+              await AlbumSaver.saveImageToAlbum(tempFile, fileName);
+            } else {
+              await AlbumSaver.saveImageToAlbumIos(tempFile, fileName);
+            }
             successCount++;
+          } catch (e) {
+            print('Error saving image $index with AlbumSaver: $e');
+          } finally {
+            // Clean up temporary file
+            if (await tempFile.exists()) {
+              await tempFile.delete();
+            }
           }
         } catch (e) {
           print('Error saving image $index: $e');

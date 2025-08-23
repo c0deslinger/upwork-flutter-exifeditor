@@ -3,7 +3,7 @@ import Flutter
 import ImageIO
 import CoreLocation
 
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate {
     override func application(
         _ application: UIApplication,

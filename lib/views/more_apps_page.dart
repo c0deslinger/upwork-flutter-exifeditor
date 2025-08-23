@@ -9,15 +9,6 @@ class MoreAppsPage extends StatelessWidget {
 
   final List<AppInfo> apps = [
     AppInfo(
-      titleKey: "app_blindbox_title",
-      descriptionKey: "app_blindbox_desc",
-      imageUrl: 'assets/images/app_blindbox.png',
-      iosLink:
-          'https://apps.apple.com/us/app/blindbox-photo-word-masking/id6740090900',
-      androidLink:
-          'https://play.google.com/store/apps/details?id=space.tombstone.blindbox',
-    ),
-    AppInfo(
       titleKey: "app_prename_title",
       descriptionKey: "app_prename_description",
       imageUrl: 'assets/images/app_prename.png',
@@ -25,15 +16,6 @@ class MoreAppsPage extends StatelessWidget {
           'https://apps.apple.com/us/app/prename-photo-rename-photo/id6449829851',
       androidLink:
           'https://play.google.com/store/apps/details?id=space.tombstone.prenamephoto',
-    ),
-    AppInfo(
-      titleKey: "app_tunetrack_title",
-      descriptionKey: "app_tunetrack_description",
-      imageUrl: 'assets/images/app_tunetrack.png',
-      iosLink:
-          'https://apps.apple.com/us/app/tunetracks-play-for-youtube/id6470999776',
-      androidLink:
-          'https://play.google.com/store/apps/details?id=space.tombstone.tunetracks',
     ),
     AppInfo(
       titleKey: "app_multiple_url_title",
@@ -45,13 +27,41 @@ class MoreAppsPage extends StatelessWidget {
           'https://play.google.com/store/apps/details?id=com.koji.multitabbrowser',
     ),
     AppInfo(
-      titleKey: "app_airecipe_title",
-      descriptionKey: "app_airecipe_description",
-      imageUrl: 'assets/images/app_airecipe.png',
-      iosLink: 'https://apps.apple.com/us/app/ai-recipe-creator/id6708237488',
+      titleKey: "app_tunetrack_title",
+      descriptionKey: "app_tunetrack_description",
+      imageUrl: 'assets/images/app_tunetrack.png',
+      iosLink:
+          'https://apps.apple.com/us/app/tunetracks-play-for-youtube/id6470999776',
       androidLink:
-          'https://play.google.com/store/apps/details?id=space.tombstone.airecipecreator',
+          'https://play.google.com/store/apps/details?id=space.tombstone.tunetracks',
     ),
+    AppInfo(
+      titleKey: "app_blindbox_title",
+      descriptionKey: "app_blindbox_desc",
+      imageUrl: 'assets/images/app_blindbox.png',
+      iosLink:
+          'https://apps.apple.com/us/app/blindbox-photo-word-masking/id6740090900',
+      androidLink:
+          'https://play.google.com/store/apps/details?id=space.tombstone.blindbox',
+    ),
+
+    AppInfo(
+      titleKey: "app_cheapest_store_title",
+      descriptionKey: "app_cheapest_store_desc",
+      imageUrl: 'assets/images/app_cheapest_store.png',
+      iosLink:
+          'https://apps.apple.com/us/app/cheapest-store-x-shopping-list/id6741428184',
+      androidLink:
+          'https://play.google.com/store/apps/details?id=space.tombstone.cheapeststorememo',
+    ),
+    // AppInfo(
+    //   titleKey: "app_airecipe_title",
+    //   descriptionKey: "app_airecipe_description",
+    //   imageUrl: 'assets/images/app_airecipe.png',
+    //   iosLink: 'https://apps.apple.com/us/app/ai-recipe-creator/id6708237488',
+    //   androidLink:
+    //       'https://play.google.com/store/apps/details?id=space.tombstone.airecipecreator',
+    // ),
     AppInfo(
       titleKey: "more_apps",
       imageUrl: 'assets/images/manager.png',

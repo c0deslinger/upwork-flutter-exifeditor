@@ -115,6 +115,8 @@ Map<String, String> languageEn = {
   "app_multiple_url_desc": "Not use your default browser",
   "app_caloriescan_title": "Calorie Scan - calc via photo",
   "app_caloriescan_desc": "Calculate calories w/ camera",
+  "app_cheapest_store_title": "Cheapest Store x Shopping List",
+  "app_cheapest_store_desc": "Shop for the best deals memo",
   "app_blindbox_title": "BlindBox_photo word masking",
   "app_blindbox_desc": "Fill in the blank quiz maker from photo & pdf",
   "more_apps": "More Apps",
@@ -139,5 +141,10 @@ Write to start""",
   "no_ads": "No Ads",
   "zenfuri_2_1m_0": "Monthly-\$2/Month",
   "zenfuri_12_1y_0": "Yearly-\$12/Year",
-  "50_off": "SAVE 50%"
+  "50_off": "SAVE 50%",
+  "select_images": "Select Images",
+  "image_not_found_title": "Image data not found",
+  "image_not_found_desc":
+      "It seems like this is your first time installing or you are reinstalling the application. Please take a picture by pressing the camera button to display the photo collection.",
+  "no_images_found": "No images found",
 };

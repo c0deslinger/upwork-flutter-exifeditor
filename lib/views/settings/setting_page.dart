@@ -93,68 +93,6 @@ class _SettingPageState extends State<SettingPage> {
                     }),
                     GetBuilder<GlobalController>(builder: (globalController) {
                       return subMenu(
-                        "font_size".tr,
-                        const Icon(CupertinoIcons.textformat_size, size: 24),
-                        () {},
-                        value: PopupMenuButton<int>(
-                          child: SizedBox(
-                            width: 200,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                "${globalController.fontSize}",
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                            ),
-                          ),
-                          itemBuilder: (context) {
-                            return List.generate(20, (index) {
-                              int size = 12 + (index * 2);
-                              return PopupMenuItem<int>(
-                                value: size,
-                                child: Text("$size"),
-                              );
-                            });
-                          },
-                          onSelected: (size) {
-                            globalController.setFontSize(size);
-                          },
-                        ),
-                      );
-                    }),
-                    GetBuilder<GlobalController>(builder: (globalController) {
-                      return subMenu(
-                        "ruby_size".tr,
-                        const Icon(Icons.format_size_outlined, size: 24),
-                        () {},
-                        value: PopupMenuButton<int>(
-                          child: SizedBox(
-                            width: 100,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                "${globalController.rubyFontSize}",
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                            ),
-                          ),
-                          itemBuilder: (context) {
-                            return List.generate(20, (index) {
-                              int size = 12 + (index * 2);
-                              return PopupMenuItem<int>(
-                                value: size,
-                                child: Text("$size"),
-                              );
-                            });
-                          },
-                          onSelected: (size) {
-                            globalController.setRubyFontSize(size);
-                          },
-                        ),
-                      );
-                    }),
-                    GetBuilder<GlobalController>(builder: (globalController) {
-                      return subMenu(
                         "dark_mode".tr,
                         const Icon(CupertinoIcons.lightbulb_fill, size: 24),
                         () {
@@ -165,21 +103,6 @@ class _SettingPageState extends State<SettingPage> {
                           onChanged: (value) {
                             globalController.toggleDarkMode();
                           },
-                        ),
-                      );
-                    }),
-                    GetBuilder<GlobalController>(builder: (globalController) {
-                      return subMenu(
-                        "vertical_horizontal".tr,
-                        const Icon(CupertinoIcons.crop_rotate, size: 24),
-                        () {
-                          globalController.toggleLayout();
-                        },
-                        value: Text(
-                          globalController.isVertical
-                              ? "vertical".tr
-                              : "horizontal".tr,
-                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                       );
                     }),

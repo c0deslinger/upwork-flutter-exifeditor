@@ -108,6 +108,8 @@ Map<String, String> languageJa = {
   "app_multiple_url_desc": "デフォルトのブラウザ以外で複数サイトを一度に開く",
   "app_caloriescan_title": "Exif Editor",
   "app_caloriescan_desc": "写真でAIがカロリー計算するアプリ",
+  "app_cheapest_store_title": "最安店舗メモ",
+  "app_cheapest_store_desc": "買い物リストアプリ。近くの最安値を比較記録",
   "app_blindbox_title": "BlindBox_写真穴埋め問題作成",
   "app_blindbox_desc": "写真・PDFから自分で作る単語帳",
   "more_apps": "他のアプリ",
@@ -130,5 +132,10 @@ Map<String, String> languageJa = {
   "nothing_to_restore": "復元するものがありません",
   "zenfuri_2_1m_0": "月額プラン-\$2",
   "zenfuri_12_1y_0": "年額プラン-\$12",
-  "50_off": "50%お得"
+  "50_off": "50%お得",
+  "select_images": "画像を選択",
+  "image_not_found_title": "画像データが見つかりません",
+  "image_not_found_desc":
+      "アプリケーションを初めてインストールしたか、再インストールしたようです。写真集を表示するにはカメラボタンを押して写真を撮ってください。",
+  "no_images_found": "画像が見つかりません",
 };

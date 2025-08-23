@@ -57,14 +57,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  brotli:
-    dependency: transitive
-    description:
-      name: brotli
-      sha256: "7f891558ed779aab2bed874f0a36b8123f9ff3f19cf6efbee89e18ed294945ae"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.0"
   build:
     dependency: transitive
     description:
@@ -273,22 +265,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.7"
-  exif:
-    dependency: "direct main"
-    description:
-      name: exif
-      sha256: a7980fdb3b7ffcd0b035e5b8a5e1eef7cadfe90ea6a4e85ebb62f87b96c7a172
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.0"
-  exif_reader:
-    dependency: "direct main"
-    description:
-      name: exif_reader
-      sha256: "548ccc25be936e508c6a20706ae5e2796687b55b9db851962db1cd20fe6abfd9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.16.1"
   fake_async:
     dependency: transitive
     description:
@@ -358,14 +334,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_exif_rotation:
-    dependency: "direct main"
-    description:
-      name: flutter_exif_rotation
-      sha256: f581601523bbb7fbec3a0498fe930bf6c48f627d4548d859b2772230edfbe658
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.2"
   flutter_image_compress:
     dependency: "direct main"
     description:
@@ -520,6 +488,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  fluttertoast:
+    dependency: "direct main"
+    description:
+      name: fluttertoast
+      sha256: "25e51620424d92d3db3832464774a6143b5053f15e382d8ffbfd40b6e795dcf1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.2.12"
   freezed_annotation:
     dependency: transitive
     description:
@@ -704,6 +680,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
+  image_save:
+    dependency: "direct main"
+    description:
+      path: image_save-master
+      relative: true
+    source: path
+    version: "5.0.0"
   in_app_purchase:
     dependency: "direct main"
     description:
@@ -768,14 +751,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  iso_base_media:
-    dependency: transitive
-    description:
-      name: iso_base_media
-      sha256: "0a94fa4ff4ce7e6894d7afc96c1eee6911c12827f8cf184ca752ce3437a818a1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.6.1"
   json_annotation:
     dependency: transitive
     description:
@@ -856,14 +831,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.16.0"
-  metadata:
-    dependency: "direct main"
-    description:
-      name: metadata
-      sha256: "1220d7391d1c9d161e3af477c088fee7ffe2b74324e793adf56aeb359dfae16f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   mime:
     dependency: transitive
     description:
@@ -1032,14 +999,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.10.6"
-  random_access_source:
-    dependency: transitive
-    description:
-      name: random_access_source
-      sha256: "26d1509a9fd935ab9c77102ab4c94b343d36216387d985975c380efe450b81b8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
   recase:
     dependency: transitive
     description:
@@ -1048,6 +1007,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
+  saver_gallery:
+    dependency: "direct main"
+    description:
+      name: saver_gallery
+      sha256: bf59475e50b73d666630bed7a5fdb621fed92d637f64e3c61ce81653ec6a833c
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.1"
   screenshot:
     dependency: "direct main"
     description:
@@ -1144,14 +1111,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  simple_exif:
-    dependency: "direct main"
-    description:
-      name: simple_exif
-      sha256: "50a684aac662637cdfb2de29e9768c245c5cadd5a76df1cf17b4ec58e113654d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.2"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -1357,14 +1316,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.4"
-  utility:
-    dependency: transitive
-    description:
-      name: utility
-      sha256: "200d264c3804e87da7ea36aa81bd73fb845d2cb7b2e820f3f357a0a2bd4e37f5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   uuid:
     dependency: transitive
     description:
@@ -1501,14 +1452,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.5.0"
-  xmp:
-    dependency: transitive
-    description:
-      name: xmp
-      sha256: "317a023e882101713cd12a25aa9f2e2f2ed61146f2a79e20ed0dd31787b9b895"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   yaml:
     dependency: transitive
     description:

@@ -24,7 +24,7 @@ class InAppPurchaseController extends GetxController {
 
   final bool kAutoConsume = Platform.isIOS || true;
 
-  String productId = 'zenfuri_tip';
+  String productId = 'exifphoto_tip';
   // String kUpgradeId = 'upgrade';
   // String kSilverSubscriptionId = 'subscription_silver';
   // String kGoldSubscriptionId = 'subscription_gold';

@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
-import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:drug_search/utils/album_saver.dart';
 
 class ExifEditorPage extends StatefulWidget {
   static const routeName = "/exifEditor";
@@ -171,7 +171,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
   }
 
   Future<void> _saveImage(String originalFileName) async {
-    print('Save button clicked! Starting save process...');
+    debugPrint('Save button clicked! Starting save process...');
 
     // Show rename dialog first
     final TextEditingController nameController = TextEditingController(
@@ -267,7 +267,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
       }
 
       final Uint8List imageBytes = await originalFile.readAsBytes();
-      print('Original image size: ${imageBytes.length} bytes');
+      debugPrint('Original image size: ${imageBytes.length} bytes');
 
       // Decode the image
       final img.Image? originalImage = img.decodeImage(imageBytes);
@@ -277,42 +277,48 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
         return;
       }
 
-      print(
+      debugPrint(
           'Original image dimensions: ${originalImage.width}x${originalImage.height}');
 
       // Calculate the new orientation value
       final int newOrientationValue = _calculateNewOrientationValue();
-      print('New orientation value: $newOrientationValue');
+      debugPrint('New orientation value: $newOrientationValue');
 
       // Apply the rotation transformation to the image data
       img.Image rotatedImage = originalImage;
       if (currentRotation != 0) {
-        print('Applying rotation: ${currentRotation.toInt()} degrees');
+        debugPrint('Applying rotation: ${currentRotation.toInt()} degrees');
         rotatedImage =
             img.copyRotate(originalImage, angle: currentRotation.toInt());
-        print(
+        debugPrint(
             'Rotated image dimensions: ${rotatedImage.width}x${rotatedImage.height}');
       }
 
       // Encode the image
       final Uint8List encodedImage = img.encodeJpg(rotatedImage, quality: 95);
-      print('Encoded image size: ${encodedImage.length} bytes');
+      debugPrint('Encoded image size: ${encodedImage.length} bytes');
 
-      // Save image to gallery using image_gallery_saver
-      print('Saving to gallery...');
+      // Save the encoded image to a temporary file
+      final Directory tempDir = await getTemporaryDirectory();
+      final String tempPath =
+          '${tempDir.path}/temp_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final File tempFile = File(tempPath);
+      await tempFile.writeAsBytes(encodedImage);
+      debugPrint('Temporary file created: $tempPath');
 
-      final result = await ImageGallerySaverPlus.saveImage(
-        encodedImage,
-        quality: 95,
-        name: newFileName,
-      );
+      // Save image to gallery using AlbumSaver
+      debugPrint('Saving to gallery using AlbumSaver...');
 
-      print('Save result: $result');
+      try {
+        if (Platform.isAndroid) {
+          await AlbumSaver.saveImageToAlbum(tempFile, newFileName);
+        } else {
+          await AlbumSaver.saveImageToAlbumIos(tempFile, newFileName);
+        }
 
-      // Close loading dialog
-      Get.back();
+        // Close loading dialog
+        Get.back();
 
-      if (result['isSuccess'] == true) {
         // Show success message
         Get.snackbar(
           'Success',
@@ -325,11 +331,19 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
 
         // Navigate back to previous page
         Get.back();
-      } else {
-        throw Exception('Failed to save to gallery: ${result['errorMessage']}');
+      } catch (e) {
+        // Close loading dialog
+        Get.back();
+        throw Exception('Failed to save to gallery: $e');
+      } finally {
+        // Clean up temporary file
+        if (await tempFile.exists()) {
+          await tempFile.delete();
+          debugPrint('Temporary file cleaned up');
+        }
       }
     } catch (e) {
-      print('Error saving image: $e');
+      debugPrint('Error saving image: $e');
 
       // Close loading dialog
       Get.back();

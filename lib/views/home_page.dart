@@ -2,9 +2,12 @@ import 'dart:io';
 
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:drug_search/admob/ads_controller.dart';
+import 'package:drug_search/admob/interstitial_controller.dart';
 import 'package:drug_search/controllers/file_controller.dart';
 import 'package:drug_search/controllers/global_controller.dart';
 import 'package:drug_search/admob/reward_ad_controller.dart';
+import 'package:drug_search/utils/exporter.dart';
+import 'package:drug_search/views/image_selection_page.dart';
 
 import 'package:drug_search/views/settings/setting_page.dart';
 import 'package:drug_search/views/exif_preview_page.dart';
@@ -14,6 +17,8 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = "/home";
@@ -25,6 +30,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final AdsController adsController = Get.find();
+  final InterstitialController interstitialController = Get.find();
   final GlobalController globalController = Get.find();
   final RewardAdController rewardAdController = Get.find();
   final TextEditingController inputController = TextEditingController();
@@ -135,17 +141,47 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             fontSize: 20,
           ),
         ),
+        leading: InkWell(
+          child: const Icon(Icons.settings),
+          onTap: () {
+            Get.toNamed(SettingPage.routeName);
+          },
+        ),
         centerTitle: true,
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            child: GestureDetector(
-              child: const Icon(CupertinoIcons.settings),
-              onTap: () {
-                Get.toNamed(SettingPage.routeName);
-              },
-            ),
-          ),
+          GetBuilder<GlobalController>(builder: (globalControllerRes) {
+            final String? savedZip = globalControllerRes.savedZip;
+            debugPrint('saved zip: $savedZip');
+            return Builder(builder: (context) {
+              debugPrint("saved path ${globalControllerRes.savedZip}");
+              return InkWell(
+                onTap: () async {
+                  if (savedZip == null) {
+                    // Clear deleted images list when no ZIP is available
+                    await Exporter.clearDeletedImages();
+                    showAlertDialog(
+                        context: context,
+                        title: 'image_not_found_title'.tr,
+                        content: 'image_not_found_desc'.tr);
+                  } else {
+                    // dataCameraController.isCameraStillCapture.value = true;
+                    interstitialController.showInterstitialAds(() async {
+                      if (context.mounted) {
+                        selectImageToShare();
+                      }
+                    });
+                  }
+                },
+                child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                    child: const Icon(
+                      Icons.download,
+                      color: Colors.white,
+                    )),
+              );
+            });
+          }),
         ],
       ),
       body: SafeArea(
@@ -224,5 +260,90 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
       ),
     );
+  }
+
+  void showAlertDialog({
+    required BuildContext context,
+    String title = 'Alert', // Default title added
+    required String content,
+    String? confirmText,
+    VoidCallback? onConfirm,
+  }) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title:
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                onConfirm?.call(); // Optional callback if needed
+              },
+              child: Text(confirmText ?? 'OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> selectImageToShare() async {
+    String tempPath = "";
+    final box = context.findRenderObject() as RenderBox?;
+    if (Platform.isIOS) {
+      tempPath = globalController.savedPath ?? "";
+    } else {
+      Directory tempDir = await getTemporaryDirectory();
+      tempPath = "${tempDir.path}/extracted";
+      await extractZip(globalController.savedZip!, tempPath);
+    }
+
+    debugPrint("temp path $tempPath");
+
+    // Navigasi ke halaman pemilihan gambar
+    final List<String>? selectedImages = await Get.to(() => ImageSelectionPage(
+          tempPath: tempPath,
+          originalZipPath:
+              Platform.isAndroid ? globalController.savedZip : null,
+          isIOS: Platform.isIOS,
+        ));
+
+    if (selectedImages != null && selectedImages.isNotEmpty) {
+      String newZipPath =
+          await createNewZipFromSelectedImages(selectedImages, tempPath);
+
+      // Bagikan file ZIP baru
+      XFile file = XFile(newZipPath);
+      int size = await file.length();
+      debugPrint("size $size");
+      await Share.shareXFiles([file],
+          sharePositionOrigin: Rect.fromLTWH(
+              0,
+              0,
+              MediaQuery.of(context).size.width,
+              MediaQuery.of(context).size.height / 2));
+
+      File newZipFile = File(newZipPath);
+      if (newZipFile.existsSync()) {
+        newZipFile.deleteSync();
+        debugPrint("deleted $newZipPath");
+      }
+
+      // Setelah kembali dari halaman, hapus folder sementara
+      if (Platform.isAndroid) {
+        await _deleteTempDirectory(tempPath);
+      }
+    }
+  }
+
+  Future<void> _deleteTempDirectory(String tempPath) async {
+    debugPrint("delete directory");
+    final dir = Directory(tempPath);
+    if (await dir.exists()) {
+      dir.deleteSync(recursive: true);
+    }
   }
 }

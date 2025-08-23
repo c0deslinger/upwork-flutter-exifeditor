@@ -1,4 +1,5 @@
 import 'package:drug_search/admob/ads_controller.dart';
+import 'package:drug_search/admob/interstitial_controller.dart';
 import 'package:drug_search/controllers/file_controller.dart';
 import 'package:drug_search/controllers/global_controller.dart';
 import 'package:drug_search/admob/reward_ad_controller.dart';
@@ -49,6 +50,7 @@ class _MyAppState extends State<MyApp> {
     Get.put(RewardAdController());
     Get.put(InAppPurchaseController());
     Get.put(RevenucatController(), permanent: true);
+    Get.put(InterstitialController());
     return GetBuilder<GlobalController>(
         init: globalController,
         builder: (appControllerVal) {
