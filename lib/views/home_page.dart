@@ -243,7 +243,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                           icon: const Icon(Icons.add_photo_alternate, size: 24),
                           label: Text(
-                            'Select Multiple Images'.tr,
+                            'select_multiple_images'.tr,
                             style: GoogleFonts.mPlusRounded1c(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,

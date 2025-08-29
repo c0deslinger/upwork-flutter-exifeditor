@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:drug_search/admob/banner_ad.dart';
 import 'package:drug_search/controllers/global_controller.dart';
 import 'package:drug_search/utils/exporter.dart';
 import 'package:flutter/material.dart';

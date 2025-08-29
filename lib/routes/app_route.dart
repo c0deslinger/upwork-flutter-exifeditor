@@ -5,7 +5,6 @@ import 'package:drug_search/views/settings/setting_page.dart';
 import 'package:drug_search/views/exif_preview_page.dart';
 import 'package:drug_search/views/exif_info_page.dart';
 import 'package:drug_search/views/exif_editor_page.dart';
-import 'package:drug_search/views/exif_library_selector_page.dart';
 import 'package:get/get.dart';
 
 class AppRoute {

@@ -181,7 +181,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
     final String? newFileName = await Get.dialog<String>(
       AlertDialog(
         title: Text(
-          'Save Image',
+          'save_image'.tr,
           style: GoogleFonts.mPlusRounded1c(
             fontWeight: FontWeight.bold,
           ),
@@ -190,7 +190,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Enter a name for the image:',
+              'enter_image_name'.tr,
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey.shade600,
@@ -200,8 +200,8 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
             TextField(
               controller: nameController,
               decoration: InputDecoration(
-                labelText: 'Image Name',
-                hintText: 'Enter image name',
+                labelText: 'image_name'.tr,
+                hintText: 'enter_image_name'.tr,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -216,7 +216,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              'Cancel',
+              'cancel'.tr,
               style: TextStyle(
                 color: Colors.grey.shade600,
               ),
@@ -234,7 +234,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
               foregroundColor: Colors.white,
             ),
             child: Text(
-              'Save',
+              'save_images'.tr,
               style: GoogleFonts.mPlusRounded1c(
                 fontWeight: FontWeight.bold,
               ),
@@ -250,53 +250,30 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
     }
 
     try {
-      // Show loading dialog
-      Get.dialog(
-        const Center(
-          child: CircularProgressIndicator(),
-        ),
-        barrierDismissible: false,
-      );
-
       // Read the original image
       final File originalFile = File(imagePath!);
       if (!await originalFile.exists()) {
-        Get.back(); // Close loading dialog
         Get.snackbar('Error', 'Original image file not found');
         return;
       }
 
       final Uint8List imageBytes = await originalFile.readAsBytes();
-      debugPrint('Original image size: ${imageBytes.length} bytes');
-
-      // Decode the image
       final img.Image? originalImage = img.decodeImage(imageBytes);
       if (originalImage == null) {
-        Get.back(); // Close loading dialog
         Get.snackbar('Error', 'Failed to decode image');
         return;
       }
 
-      debugPrint(
-          'Original image dimensions: ${originalImage.width}x${originalImage.height}');
-
-      // Calculate the new orientation value
-      final int newOrientationValue = _calculateNewOrientationValue();
-      debugPrint('New orientation value: $newOrientationValue');
-
-      // Apply the rotation transformation to the image data
+      // Apply rotation transformation
+      debugPrint('Applying rotation: ${currentRotation.toInt()} degrees');
       img.Image rotatedImage = originalImage;
       if (currentRotation != 0) {
-        debugPrint('Applying rotation: ${currentRotation.toInt()} degrees');
         rotatedImage =
             img.copyRotate(originalImage, angle: currentRotation.toInt());
-        debugPrint(
-            'Rotated image dimensions: ${rotatedImage.width}x${rotatedImage.height}');
       }
 
       // Encode the image
       final Uint8List encodedImage = img.encodeJpg(rotatedImage, quality: 95);
-      debugPrint('Encoded image size: ${encodedImage.length} bytes');
 
       // Save the encoded image to a temporary file
       final Directory tempDir = await getTemporaryDirectory();
@@ -304,11 +281,8 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
           '${tempDir.path}/temp_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final File tempFile = File(tempPath);
       await tempFile.writeAsBytes(encodedImage);
-      debugPrint('Temporary file created: $tempPath');
 
-      // Save image to gallery using AlbumSaver
-      debugPrint('Saving to gallery using AlbumSaver...');
-
+      // Save to gallery using AlbumSaver
       try {
         if (Platform.isAndroid) {
           await AlbumSaver.saveImageToAlbum(tempFile, newFileName);
@@ -316,39 +290,36 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
           await AlbumSaver.saveImageToAlbumIos(tempFile, newFileName);
         }
 
-        // Close loading dialog
+        // Navigate back to previous page
         Get.back();
 
         // Show success message
         Get.snackbar(
           'Success',
-          'Image saved to gallery successfully!\nSize: ${(encodedImage.length / 1024).toStringAsFixed(1)} KB',
+          'Image saved to gallery successfully!',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
           colorText: Colors.white,
           duration: const Duration(seconds: 5),
         );
-
-        // Navigate back to previous page
-        Get.back();
       } catch (e) {
-        // Close loading dialog
-        Get.back();
-        throw Exception('Failed to save to gallery: $e');
+        print('Error saving image with AlbumSaver: $e');
+        Get.snackbar(
+          'Error',
+          'Failed to save image: $e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+        );
       } finally {
         // Clean up temporary file
         if (await tempFile.exists()) {
           await tempFile.delete();
-          debugPrint('Temporary file cleaned up');
         }
       }
     } catch (e) {
-      debugPrint('Error saving image: $e');
-
-      // Close loading dialog
-      Get.back();
-
-      // Show error message
+      print('Error saving image: $e');
       Get.snackbar(
         'Error',
         'Failed to save image: $e',
@@ -365,11 +336,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
     if (imagePath == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('EXIF Editor'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Get.back(),
-          ),
+          title: Text('exif_editor'.tr),
         ),
         body: const Center(
           child: Text('No image selected'),
@@ -382,7 +349,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'EXIF Editor',
+          'exif_editor'.tr,
           style: GoogleFonts.mPlusRounded1c(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -393,13 +360,6 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: () => _saveImage(originalFileName ?? 'Unknown'),
-            tooltip: 'Save Image',
-          ),
-        ],
       ),
       body: SafeArea(
         child: Column(
@@ -556,13 +516,39 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
                       onPressed: _rotateImage,
                       icon: const Icon(Icons.rotate_right),
                       label: Text(
-                        'Rotate 90° Clockwise',
+                        'rotate_clockwise'.tr,
                         style: GoogleFonts.mPlusRounded1c(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Save button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        _saveImage(
+                            originalFileName?.split('.').first ?? 'Unknown');
+                      },
+                      icon: const Icon(Icons.save),
+                      label: Text(
+                        'save_image'.tr,
+                        style: GoogleFonts.mPlusRounded1c(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(

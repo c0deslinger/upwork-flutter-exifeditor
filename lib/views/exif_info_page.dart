@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:drug_search/views/exif_editor_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -54,10 +55,16 @@ class _ExifInfoPageState extends State<ExifInfoPage> {
         .trim();
 
     // Capitalize first letter of each word
-    return formatted.split(' ').map((word) {
+    String capitalized = formatted.split(' ').map((word) {
       if (word.isEmpty) return word;
       return word[0].toUpperCase() + word.substring(1).toLowerCase();
     }).join(' ');
+
+    return capitalized
+        .toLowerCase()
+        .replaceAll(" ", "_")
+        .replaceAll("__", "_")
+        .tr;
   }
 
   // Format EXIF value for display
@@ -227,7 +234,7 @@ class _ExifInfoPageState extends State<ExifInfoPage> {
     if (imagePath == null || exifData == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('EXIF Info'),
+          title: Text('exif_info'.tr),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Get.back(),
@@ -245,7 +252,7 @@ class _ExifInfoPageState extends State<ExifInfoPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'EXIF Info',
+          'exif_info'.tr,
           style: GoogleFonts.mPlusRounded1c(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -268,7 +275,7 @@ class _ExifInfoPageState extends State<ExifInfoPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Exif Info: $fileName',
+                    '${'exif_info'.tr}: $fileName',
                     style: GoogleFonts.mPlusRounded1c(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -277,7 +284,8 @@ class _ExifInfoPageState extends State<ExifInfoPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${exifData!.length} EXIF tags found',
+                    'exif_tags_found'
+                        .trParams({'count': exifData!.length.toString()}),
                     style: const TextStyle(
                       fontSize: 12,
                     ),
@@ -308,6 +316,70 @@ class _ExifInfoPageState extends State<ExifInfoPage> {
                 ),
               ),
             ),
+
+            //thumbnail
+            GestureDetector(
+              onTap: () async {
+                Get.toNamed(ExifEditorPage.routeName, arguments: {
+                  'imagePath': imagePath,
+                  'orientation': orientation,
+                  'orientationValue': orientationValue,
+                  'originalFileName': originalFileName,
+                });
+              },
+              child: Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(
+                          File(imagePath!),
+                          fit: BoxFit.cover,
+                          width: 60,
+                          height: 60,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'thumbnail'.tr,
+                              style: GoogleFonts.mPlusRounded1c(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              'orientation: $orientation'.tr,
+                              style: GoogleFonts.mPlusRounded1c(
+                                fontSize: 14,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              'rotation: ${_getRotationAngle()}°'.tr,
+                              style: GoogleFonts.mPlusRounded1c(
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )),
+            ),
+
             const SizedBox(height: 16),
 
             // Thumbnail and main content
@@ -339,7 +411,7 @@ class _ExifInfoPageState extends State<ExifInfoPage> {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  category.toUpperCase(),
+                                  category.toLowerCase().tr,
                                   style: GoogleFonts.mPlusRounded1c(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,

@@ -120,8 +120,9 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
       appBar: AppBar(
         title: Text(
           selectedIndices.isNotEmpty
-              ? 'Selected ${selectedIndices.length} images'
-              : 'Thumbnail',
+              ? 'selected_images'
+                  .trParams({'count': selectedIndices.length.toString()})
+              : 'thumbnail'.tr,
           style: GoogleFonts.mPlusRounded1c(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -225,7 +226,7 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
                               onPressed: _rotateSelectedImages,
                               icon: const Icon(Icons.rotate_right),
                               label: Text(
-                                'Rotate 90° Clockwise',
+                                'rotate_clockwise'.tr,
                                 style: GoogleFonts.mPlusRounded1c(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -250,7 +251,7 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
                               onPressed: _saveSelectedImages,
                               icon: const Icon(Icons.save),
                               label: Text(
-                                'Save Images',
+                                'save_images'.tr,
                                 style: GoogleFonts.mPlusRounded1c(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -358,14 +359,26 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // File name
-                        Text(
-                          fileName,
-                          style: GoogleFonts.mPlusRounded1c(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.info,
+                              size: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                fileName,
+                                style: GoogleFonts.mPlusRounded1c(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 4),
 
@@ -458,7 +471,7 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
       AlertDialog(
         title: Center(
           child: Text(
-            'Save Rotated Images',
+            'save_rotated_images'.tr,
             style: GoogleFonts.mPlusRounded1c(
               fontWeight: FontWeight.normal,
             ),
@@ -478,7 +491,8 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
                       TextField(
                         controller: nameControllers[i],
                         decoration: InputDecoration(
-                          labelText: 'Image ${i + 1} Name',
+                          labelText: 'image_name'
+                              .trParams({'index': (i + 1).toString()}),
                           hintText: 'Enter image name',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -497,7 +511,7 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              'Cancel',
+              'cancel'.tr,
               style: TextStyle(
                 color: Colors.grey.shade600,
               ),
@@ -519,7 +533,7 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
               foregroundColor: Colors.white,
             ),
             child: Text(
-              'Save All',
+              'save_all'.tr,
               style: GoogleFonts.mPlusRounded1c(
                 fontWeight: FontWeight.bold,
               ),
