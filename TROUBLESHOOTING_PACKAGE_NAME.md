@@ -4,7 +4,7 @@
 
 ### Error Description
 ```
-java.lang.ClassNotFoundException: Didn't find class "space.tombstone.exifeditor.MainActivity"
+java.lang.ClassNotFoundException: Didn't find class "space.tombstone.imagerotator.MainActivity"
 ```
 
 ### Root Cause
@@ -19,10 +19,10 @@ Error ini terjadi karena ada ketidaksesuaian antara:
 File: `android/app/build.gradle`
 ```gradle
 android {
-    namespace "space.tombstone.exifeditor"
+    namespace "space.tombstone.imagerotator"
     
     defaultConfig {
-        applicationId "space.tombstone.exifeditor"
+        applicationId "space.tombstone.imagerotator"
         // ...
     }
 }
@@ -31,7 +31,7 @@ android {
 #### 2. Update MainActivity.kt Package Declaration
 File: `android/app/src/main/kotlin/space/tombstone/exifeditor/MainActivity.kt`
 ```kotlin
-package space.tombstone.exifeditor  // Must match applicationId
+package space.tombstone.imagerotator  // Must match applicationId
 ```
 
 #### 3. Ensure Correct File Location
@@ -56,12 +56,12 @@ flutter run
 #### Issue 1: Wrong Package Declaration
 ❌ **Wrong:**
 ```kotlin
-package space.tombstone.exifeditor
+package space.tombstone.imagerotator
 ```
 
 ✅ **Correct:**
 ```kotlin
-package space.tombstone.exifeditor
+package space.tombstone.imagerotator
 ```
 
 #### Issue 2: Wrong File Location
@@ -78,12 +78,12 @@ android/app/src/main/kotlin/space/tombstone/exifeditor/MainActivity.kt
 #### Issue 3: Mismatched Application ID
 ❌ **Wrong:**
 ```gradle
-applicationId "space.tombstone.exifeditor"
+applicationId "space.tombstone.imagerotator"
 ```
 
 ✅ **Correct:**
 ```gradle
-applicationId "space.tombstone.exifeditor"
+applicationId "space.tombstone.imagerotator"
 ```
 
 ### Verification Steps
@@ -108,10 +108,10 @@ applicationId "space.tombstone.exifeditor"
 #### Step 1: Update build.gradle
 ```gradle
 android {
-    namespace "space.tombstone.exifeditor"
+    namespace "space.tombstone.imagerotator"
     
     defaultConfig {
-        applicationId "space.tombstone.exifeditor"
+        applicationId "space.tombstone.imagerotator"
         minSdkVersion 22
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
@@ -122,7 +122,7 @@ android {
 
 #### Step 2: Update MainActivity.kt
 ```kotlin
-package space.tombstone.exifeditor
+package space.tombstone.imagerotator
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine

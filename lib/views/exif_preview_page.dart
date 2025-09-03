@@ -458,13 +458,15 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
 
     // Show rename dialog with multiple text fields
     final List<TextEditingController> nameControllers = [];
+    final List<String> originalFileExtensions = [];
     final List<String> selectedFileNames = [];
 
     for (int index in selectedIndices) {
       nameControllers.add(TextEditingController(
-        text: originalFileNames[index],
+        text: originalFileNames[index].split('.').first,
       ));
       selectedFileNames.add(originalFileNames[index]);
+      originalFileExtensions.add(originalFileNames[index].split('.').last);
     }
 
     final List<String>? newFileNames = await Get.dialog<List<String>>(
@@ -493,7 +495,9 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
                         decoration: InputDecoration(
                           labelText: 'image_name'
                               .trParams({'index': (i + 1).toString()}),
-                          hintText: 'Enter image name',
+                          hintText:
+                              'Enter image name (will be saved as: ${nameControllers[i].text}.${originalFileExtensions[i]})',
+                          suffixText: '.${originalFileExtensions[i]}',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -523,6 +527,11 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
                   .map((controller) => controller.text.trim())
                   .where((name) => name.isNotEmpty)
                   .toList();
+
+              for (int i = 0; i < fileNames.length; i++) {
+                fileNames[i] = '${fileNames[i]}.${originalFileExtensions[i]}';
+                debugPrint('fileNames[i]: ${fileNames[i]}');
+              }
 
               if (fileNames.length == selectedIndices.length) {
                 Get.back(result: fileNames);

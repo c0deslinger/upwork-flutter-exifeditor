@@ -140,7 +140,7 @@ class _SettingPageState extends State<SettingPage> {
                         ), () {
                       if (Platform.isAndroid) {
                         Share.share(
-                            'https://play.google.com/store/apps/details?id=space.tombstone.exifeditor');
+                            'https://play.google.com/store/apps/details?id=space.tombstone.imagerotator');
                       } else if (Platform.isIOS) {
                         Share.share(
                             'https://apps.apple.com/us/app/ai-recipe-creator/id6708237488');

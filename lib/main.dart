@@ -48,14 +48,14 @@ class _MyAppState extends State<MyApp> {
     Get.put(YahooJlpController());
     Get.put(AdsController());
     Get.put(RewardAdController());
-    Get.put(InAppPurchaseController());
     Get.put(RevenucatController(), permanent: true);
+    Get.put(InAppPurchaseController());
     Get.put(InterstitialController());
     return GetBuilder<GlobalController>(
         init: globalController,
         builder: (appControllerVal) {
           return GetMaterialApp(
-            title: 'Exif Editor',
+            title: 'Image Rotator',
             locale: appControllerVal.locale,
             theme: Get.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,

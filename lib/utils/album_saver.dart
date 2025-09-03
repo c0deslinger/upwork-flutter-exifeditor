@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:drug_search/controllers/global_controller.dart';
 import 'package:drug_search/utils/exporter.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_save/image_save.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,7 +16,7 @@ class AlbumSaver {
   ///
   /// Returns the path of the saved image or null if an error occurred.
   static Future<String?> saveImageToAlbumIos(File image, String rename) async {
-    String toastMessage = "image_saved_gallery".tr;
+    // String toastMessage = "image_saved_gallery".tr;
     String? path;
     try {
       final String newPath = '${image.parent.path}/$rename.jpg';
@@ -27,7 +26,7 @@ class AlbumSaver {
 
       // Save image to album
       await ImageSave.saveImage(renamedImage.readAsBytesSync(), "$rename.jpg",
-          albumName: "ExifEditor");
+          albumName: "ImageRotator");
 
       // Remove from deleted images list if it was previously deleted
       await Exporter.removeFromDeletedImages("$rename.jpg");
@@ -36,9 +35,7 @@ class AlbumSaver {
       path = renamedImage.parent.path;
       GlobalController globalController = Get.find();
       globalController.setSavedPath(path: path);
-    } catch (e, s) {
-      toastMessage = e.toString();
-    }
+    } catch (e) {}
 
     return path;
   }
@@ -49,7 +46,7 @@ class AlbumSaver {
   /// [imageName] is the new name for the image file.
   static Future<void> saveImageToAlbum(File imageFile, String imageName) async {
     try {
-      String relativePath = "Pictures/ExifEditor";
+      String relativePath = "Pictures/ImageRotator";
       final result = await SaverGallery.saveFile(
           filePath: imageFile.path,
           skipIfExists: false,

@@ -1,5 +1,5 @@
-"CFBundleName" = "Exif Editor";
-"CFBundleDisplayName" = "Exif Editor";
+"CFBundleName" = "Image Rotator";
+"CFBundleDisplayName" = "Image Rotator";
 "NSCameraUsageDescription" = "画像に含まれる日本語テキストを解析するため、カメラへのアクセスが必要です。";
 "NSPhotoLibraryAddUsageDescription" = "写真に含まれる日本語テキストを解析するため、写真ライブラリへのアクセス権が必要です。";
 "NSPhotoLibraryUsageDescription" = "写真に含まれる日本語テキストを解析するため、写真ライブラリへのアクセス権が必要です。";

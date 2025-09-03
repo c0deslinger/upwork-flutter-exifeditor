@@ -107,6 +107,18 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
               'libraryType': 'native_exif',
             },
           );
+        } else {
+          // Show feedback when no images are selected or permission denied
+          Get.snackbar(
+            'No Images Selected',
+            'No images were selected. Please try again or check your photo permissions.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.orange.withOpacity(0.8),
+            colorText: Colors.white,
+            duration: const Duration(seconds: 3),
+            margin: const EdgeInsets.all(16),
+            borderRadius: 8,
+          );
         }
       },
     );
