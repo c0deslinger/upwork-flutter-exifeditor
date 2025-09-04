@@ -1,10 +1,8 @@
 import 'package:drug_search/controllers/global_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
-import 'package:photo_manager/photo_manager.dart';
 
 class FileController extends GetxController {
   var imageCamera = ''.obs;
@@ -43,77 +41,77 @@ class FileController extends GetxController {
     onPicked(images);
   }
 
-  Future<void> pickWithPhotoManager(
-      {required Function(List<XFile>) onPicked}) async {
-    try {
-      // Request permission
-      final PermissionState ps = await PhotoManager.requestPermissionExtend();
-      debugPrint('ps: ${ps.isAuth}');
+  // Future<void> pickWithPhotoManager(
+  //     {required Function(List<XFile>) onPicked}) async {
+  //   try {
+  //     // Request permission
+  //     final PermissionState ps = await PhotoManager.requestPermissionExtend();
+  //     debugPrint('ps: ${ps.isAuth}');
 
-      if (!ps.isAuth) {
-        // Permission denied - try using image_picker as fallback
-        debugPrint('Photo permission denied, trying image_picker fallback');
-        // await _pickWithImagePickerFallback(onPicked: onPicked);
-        return;
-      }
+  //     if (!ps.isAuth) {
+  //       // Permission denied - try using image_picker as fallback
+  //       debugPrint('Photo permission denied, trying image_picker fallback');
+  //       // await _pickWithImagePickerFallback(onPicked: onPicked);
+  //       return;
+  //     }
 
-      // Get all image assets
-      List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
-        type: RequestType.image,
-      );
+  //     // Get all image assets
+  //     List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
+  //       type: RequestType.image,
+  //     );
 
-      if (albums.isEmpty) {
-        debugPrint('No albums found, trying image_picker fallback');
-        await _pickWithImagePickerFallback(onPicked: onPicked);
-        return;
-      }
+  //     if (albums.isEmpty) {
+  //       debugPrint('No albums found, trying image_picker fallback');
+  //       await _pickWithImagePickerFallback(onPicked: onPicked);
+  //       return;
+  //     }
 
-      List<AssetEntity> photos =
-          await albums[0].getAssetListRange(start: 0, end: 1);
+  //     List<AssetEntity> photos =
+  //         await albums[0].getAssetListRange(start: 0, end: 1);
 
-      if (photos.isEmpty) {
-        debugPrint('No photos found in album, trying image_picker fallback');
-        await _pickWithImagePickerFallback(onPicked: onPicked);
-        return;
-      }
+  //     if (photos.isEmpty) {
+  //       debugPrint('No photos found in album, trying image_picker fallback');
+  //       await _pickWithImagePickerFallback(onPicked: onPicked);
+  //       return;
+  //     }
 
-      List<XFile> images = [];
-      for (var photo in photos) {
-        debugPrint('photo.title: ${photo.title}');
-        debugPrint('photo.relativePath: ${photo.relativePath}');
+  //     List<XFile> images = [];
+  //     for (var photo in photos) {
+  //       debugPrint('photo.title: ${photo.title}');
+  //       debugPrint('photo.relativePath: ${photo.relativePath}');
 
-        // Get the file path properly
-        final file = await photo.file;
-        if (file != null) {
-          images.add(XFile(file.path));
-        }
-      }
+  //       // Get the file path properly
+  //       final file = await photo.file;
+  //       if (file != null) {
+  //         images.add(XFile(file.path));
+  //       }
+  //     }
 
-      onPicked(images);
-    } catch (e) {
-      debugPrint('Error in pickWithPhotoManager: $e');
-      // Try fallback method
-      await _pickWithImagePickerFallback(onPicked: onPicked);
-    }
-  }
+  //     onPicked(images);
+  //   } catch (e) {
+  //     debugPrint('Error in pickWithPhotoManager: $e');
+  //     // Try fallback method
+  //     await _pickWithImagePickerFallback(onPicked: onPicked);
+  //   }
+  // }
 
-  Future<void> _pickWithImagePickerFallback(
-      {required Function(List<XFile>) onPicked}) async {
-    try {
-      debugPrint('Using image_picker fallback');
-      final List<XFile> images = await _picker.pickMultiImage();
-      if (images.isEmpty) {
-        debugPrint('No images selected with image_picker');
-        onPicked([]);
-        return;
-      }
-      debugPrint('Selected ${images.length} images with image_picker');
-      onPicked(images);
-    } catch (e) {
-      debugPrint('Error in image_picker fallback: $e');
-      onPicked([]);
-    }
-  }
+  // Future<void> _pickWithImagePickerFallback(
+  //     {required Function(List<XFile>) onPicked}) async {
+  //   try {
+  //     debugPrint('Using image_picker fallback');
+  //     final List<XFile> images = await _picker.pickMultiImage();
+  //     if (images.isEmpty) {
+  //       debugPrint('No images selected with image_picker');
+  //       onPicked([]);
+  //       return;
+  //     }
+  //     debugPrint('Selected ${images.length} images with image_picker');
+  //     onPicked(images);
+  //   } catch (e) {
+  //     debugPrint('Error in image_picker fallback: $e');
+  //     onPicked([]);
+  //   }
+  // }
 
   Future<void> pickImageFromCamera(
       {required Function(String) onCaptured}) async {

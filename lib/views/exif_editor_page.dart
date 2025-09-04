@@ -336,7 +336,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
     if (imagePath == null) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('exif_editor'.tr),
+          title: Text('apptitle'.tr),
         ),
         body: const Center(
           child: Text('No image selected'),
@@ -349,7 +349,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'exif_editor'.tr,
+          'apptitle'.tr,
           style: GoogleFonts.mPlusRounded1c(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -372,7 +372,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Editing: $fileName',
+                    '${'editing'.tr}: $fileName',
                     style: GoogleFonts.mPlusRounded1c(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -381,7 +381,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Original Orientation: $orientation (Value: $orientationValue)',
+                    '${'original_orientation'.tr}: $orientation (Value: $orientationValue)',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey.shade600,
@@ -445,7 +445,7 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Current Rotation:',
+                        '${'current_rotation'.tr}:',
                         style: GoogleFonts.mPlusRounded1c(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
