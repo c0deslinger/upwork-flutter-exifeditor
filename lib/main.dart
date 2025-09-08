@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
     Get.put(FileController());
     Get.put(OcrController());
     Get.put(YahooJlpController());
-    Get.put(AdsController());
+    Get.put(AppOpenAdsController());
     Get.put(RewardAdController());
     Get.put(RevenucatController(), permanent: true);
     Get.put(InAppPurchaseController());

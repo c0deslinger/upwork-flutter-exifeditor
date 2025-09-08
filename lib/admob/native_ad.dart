@@ -22,8 +22,8 @@ class _NativeAdAdmobState extends State<NativeAdAdmob> {
       : 'ca-app-pub-3940256099942544/3986624511';
 
   final String _adUnitId = Platform.isAndroid
-      ? 'ca-app-pub-4385164164114125/3166153887'
-      : 'ca-app-pub-4385164164114125/1331501490';
+      ? 'ca-app-pub-4385164164114125/3217333773'
+      : 'ca-app-pub-4385164164114125/9459895221';
 
   String getAdunitId() {
     if (kDebugMode) {

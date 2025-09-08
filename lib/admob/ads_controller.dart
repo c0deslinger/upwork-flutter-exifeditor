@@ -6,9 +6,9 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AdsController extends GetxController {
-  final _appOpenUnitIdIos = 'ca-app-pub-4385164164114125/8174785365';
-  final _appOpenUnitIdAndroid = 'ca-app-pub-4385164164114125/8720473051';
+class AppOpenAdsController extends GetxController {
+  final _appOpenUnitIdIos = 'ca-app-pub-4385164164114125/4826515645';
+  final _appOpenUnitIdAndroid = 'ca-app-pub-4385164164114125/1772976891';
   final _appOpenUnitIdAndroidTest = 'ca-app-pub-3940256099942544/9257395921';
 
   AppOpenAd? _appOpenAd;

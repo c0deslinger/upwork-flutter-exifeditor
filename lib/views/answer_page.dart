@@ -71,8 +71,8 @@ class _AnswerPageState extends State<AnswerPage> {
             ),
           ),
           const BannerAdmob(
-            adunitAndroid: 'ca-app-pub-4385164164114125/4353852639',
-            adunitIos: 'ca-app-pub-4385164164114125/2306273796',
+            adunitAndroid: 'ca-app-pub-4385164164114125/5843497114',
+            adunitIos: 'ca-app-pub-4385164164114125/9635989197',
           ),
         ],
       ),

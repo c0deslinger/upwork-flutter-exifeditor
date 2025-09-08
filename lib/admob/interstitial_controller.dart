@@ -7,15 +7,14 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class InterstitialController extends GetxController {
-  final _interstitialUnitIdIos = 'ca-app-pub-4385164164114125/8608522601';
+  final _interstitialUnitIdIos = 'ca-app-pub-4385164164114125/8322907521';
   final _interstitialUnitIdIosTest = 'ca-app-pub-3940256099942544/4411468910';
 
-  final _interstitialUnitIdAndroid = 'ca-app-pub-4385164164114125/7138909713';
+  final _interstitialUnitIdAndroid = 'ca-app-pub-4385164164114125/3981990227';
   final _interstitialUnitIdAndroidTest =
       'ca-app-pub-3940256099942544/1033173712';
 
   InterstitialAd? _interstitialAd;
-  AppOpenAd? _appOpenAd;
   // Ubah dari direct initialization ke late declaration
   late RevenucatController revenucatController;
 

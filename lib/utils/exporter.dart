@@ -65,7 +65,7 @@ class Exporter {
 
       // Create a unique filename with timestamp
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final zipFilePath = path.join(tempDir.path, 'ExifEditor.zip');
+      final zipFilePath = path.join(tempDir.path, 'ImageRotator.zip');
 
       // Get list of deleted images to exclude
       final deletedImages = await getDeletedImages();
@@ -192,7 +192,7 @@ class Exporter {
 Future<String> createNewZipFromSelectedImages(
     List<String> selectedImages, String targetDir) async {
   final timestamp = DateTime.now().millisecondsSinceEpoch;
-  final newZipPath = '$targetDir/ExifEditor.zip';
+  final newZipPath = '$targetDir/ImageRotator.zip';
 
   debugPrint('Creating new zip at: $newZipPath');
 

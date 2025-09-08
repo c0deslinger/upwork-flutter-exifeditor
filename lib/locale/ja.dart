@@ -227,4 +227,11 @@ Map<String, String> languageJa = {
   "exif_version": "EXIFバージョン",
   "exposure_mode": "露出モード",
   "focal_len_in35mm_film": "35mmフィルムでの焦点距離",
+  "loading_images": "画像を読み込んでいます",
+  "processing_exif_data": "EXIFデータを処理しています",
+  "delete_confirmation_title": "画像を削除しますか？",
+  "delete_confirmation_desc": "選択した画像を削除してもよろしいですか？ この操作は元に戻せません。",
+  "delete_confirmation_delete": "削除",
+  "delete_confirmation_cancel": "キャンセル",
+  "imagerotator_3_1m_0": "月額プラン-\$2.99/月",
 };

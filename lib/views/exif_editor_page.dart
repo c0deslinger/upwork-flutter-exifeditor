@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:drug_search/admob/banner_ad.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -364,231 +365,240 @@ class _ExifEditorPageState extends State<ExifEditorPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header with filename
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${'editing'.tr}: $fileName',
-                    style: GoogleFonts.mPlusRounded1c(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${'original_orientation'.tr}: $orientation (Value: $orientationValue)',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Main Image Display
             Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Transform.rotate(
-                    angle: currentRotation *
-                        3.14159 /
-                        180.0, // Convert degrees to radians
-                    child: Transform.scale(
-                      scaleX: needsHorizontalMirror ? -1.0 : 1.0,
-                      scaleY: needsVerticalMirror ? -1.0 : 1.0,
-                      child: Image.file(
-                        File(imagePath!),
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: Icon(
-                              Icons.error,
-                              size: 50,
-                              color: Colors.red,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Control Panel
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                // color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(12),
-                // border: Border.all(color: Colors.grey.shade200),
-              ),
               child: Column(
                 children: [
-                  // // Current rotation info
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${'current_rotation'.tr}:',
-                        style: GoogleFonts.mPlusRounded1c(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                      Text(
-                        '${currentRotation.toStringAsFixed(1)}°',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade700,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  // // Original orientation info
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     Text(
-                  //       'Original Orientation:',
-                  //       style: GoogleFonts.mPlusRounded1c(
-                  //         fontWeight: FontWeight.bold,
-                  //         fontSize: 14,
-                  //       ),
-                  //     ),
-                  //     Text(
-                  //       'Value: ${orientationValue ?? 1}',
-                  //       style: TextStyle(
-                  //         fontSize: 14,
-                  //         color: Colors.orange.shade700,
-                  //         fontWeight: FontWeight.w500,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 8),
-
-                  // // New orientation info
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     Text(
-                  //       'New Orientation:',
-                  //       style: GoogleFonts.mPlusRounded1c(
-                  //         fontWeight: FontWeight.bold,
-                  //         fontSize: 14,
-                  //       ),
-                  //     ),
-                  //     Text(
-                  //       'Value: ${_calculateNewOrientationValue()}',
-                  //       style: TextStyle(
-                  //         fontSize: 14,
-                  //         color: Colors.blue.shade700,
-                  //         fontWeight: FontWeight.w500,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  // const SizedBox(height: 16),
-
-                  // Rotate button
-                  SizedBox(
+                  // Header with filename
+                  Container(
                     width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _rotateImage,
-                      icon: const Icon(Icons.rotate_right),
-                      label: Text(
-                        'rotate_clockwise'.tr,
-                        style: GoogleFonts.mPlusRounded1c(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Save button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        _saveImage(
-                            originalFileName?.split('.').first ?? 'Unknown');
-                      },
-                      icon: const Icon(Icons.save),
-                      label: Text(
-                        'save_image'.tr,
-                        style: GoogleFonts.mPlusRounded1c(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Mirror info
-                  if (needsHorizontalMirror || needsVerticalMirror)
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade50,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.orange.shade200),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            size: 16,
-                            color: Colors.orange.shade700,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${'editing'.tr}: $fileName',
+                          style: GoogleFonts.mPlusRounded1c(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.black,
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Mirror: ${needsHorizontalMirror ? "Horizontal" : ""}${needsHorizontalMirror && needsVerticalMirror ? " + " : ""}${needsVerticalMirror ? "Vertical" : ""}',
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${'original_orientation'.tr}: $orientation (Value: $orientationValue)',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Main Image Display
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Transform.rotate(
+                          angle: currentRotation *
+                              3.14159 /
+                              180.0, // Convert degrees to radians
+                          child: Transform.scale(
+                            scaleX: needsHorizontalMirror ? -1.0 : 1.0,
+                            scaleY: needsVerticalMirror ? -1.0 : 1.0,
+                            child: Image.file(
+                              File(imagePath!),
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(
+                                  child: Icon(
+                                    Icons.error,
+                                    size: 50,
+                                    color: Colors.red,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Control Panel
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      // color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      // border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Column(
+                      children: [
+                        // // Current rotation info
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${'current_rotation'.tr}:',
+                              style: GoogleFonts.mPlusRounded1c(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              '${currentRotation.toStringAsFixed(1)}°',
                               style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.orange.shade700,
+                                fontSize: 14,
+                                color: Colors.grey.shade700,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+
+                        // // Original orientation info
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     Text(
+                        //       'Original Orientation:',
+                        //       style: GoogleFonts.mPlusRounded1c(
+                        //         fontWeight: FontWeight.bold,
+                        //         fontSize: 14,
+                        //       ),
+                        //     ),
+                        //     Text(
+                        //       'Value: ${orientationValue ?? 1}',
+                        //       style: TextStyle(
+                        //         fontSize: 14,
+                        //         color: Colors.orange.shade700,
+                        //         fontWeight: FontWeight.w500,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                        // const SizedBox(height: 8),
+
+                        // // New orientation info
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     Text(
+                        //       'New Orientation:',
+                        //       style: GoogleFonts.mPlusRounded1c(
+                        //         fontWeight: FontWeight.bold,
+                        //         fontSize: 14,
+                        //       ),
+                        //     ),
+                        //     Text(
+                        //       'Value: ${_calculateNewOrientationValue()}',
+                        //       style: TextStyle(
+                        //         fontSize: 14,
+                        //         color: Colors.blue.shade700,
+                        //         fontWeight: FontWeight.w500,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                        // const SizedBox(height: 16),
+
+                        // Rotate button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: _rotateImage,
+                            icon: const Icon(Icons.rotate_right),
+                            label: Text(
+                              'rotate_clockwise'.tr,
+                              style: GoogleFonts.mPlusRounded1c(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+
+                        // Save button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              _saveImage(originalFileName?.split('.').first ??
+                                  'Unknown');
+                            },
+                            icon: const Icon(Icons.save),
+                            label: Text(
+                              'save_image'.tr,
+                              style: GoogleFonts.mPlusRounded1c(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Mirror info
+                        if (needsHorizontalMirror || needsVerticalMirror)
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.shade50,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: Colors.orange.shade200),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  size: 16,
+                                  color: Colors.orange.shade700,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Mirror: ${needsHorizontalMirror ? "Horizontal" : ""}${needsHorizontalMirror && needsVerticalMirror ? " + " : ""}${needsVerticalMirror ? "Vertical" : ""}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.orange.shade700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
+                  ),
                 ],
               ),
+            ),
+            const BannerAdmob(
+              adunitAndroid: 'ca-app-pub-4385164164114125/5843497114',
+              adunitIos: 'ca-app-pub-4385164164114125/9635989197',
             ),
           ],
         ),

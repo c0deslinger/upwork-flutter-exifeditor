@@ -57,7 +57,6 @@ class RevenucatController extends GetxController {
   }
 
   void checkOffering() async {
-    log("check offering");
     isLoading = true;
     update();
     try {
@@ -74,7 +73,9 @@ class RevenucatController extends GetxController {
 
   void purchase(Package packageToPurchase) async {
     try {
-      customerInfo = await Purchases.purchasePackage(packageToPurchase);
+      PurchaseResult purchaseResult =
+          await Purchases.purchasePackage(packageToPurchase);
+      customerInfo = purchaseResult.customerInfo;
       checkUserSubcription();
     } on PlatformException catch (e) {
       Get.snackbar("Error Purchase", e.message ?? "Unknown error");

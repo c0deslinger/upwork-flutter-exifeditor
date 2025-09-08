@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:drug_search/admob/ads_controller.dart';
+import 'package:drug_search/admob/banner_ad.dart';
 import 'package:drug_search/admob/interstitial_controller.dart';
 import 'package:drug_search/controllers/file_controller.dart';
 import 'package:drug_search/controllers/global_controller.dart';
@@ -29,7 +30,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  final AdsController adsController = Get.find();
+  final AppOpenAdsController appOpenAdController = Get.find();
   final InterstitialController interstitialController = Get.find();
   final GlobalController globalController = Get.find();
   final RewardAdController rewardAdController = Get.find();
@@ -86,18 +87,28 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
-    // bool isFirstTimeOpen = await globalController.checkIsFirstTimeOpen();
-    // if (state == AppLifecycleState.resumed && !isFirstTimeOpen) {
-    //   adsController.showAppOpenAd();
-    // } else {
-    //   globalController.setNotFirstTime();
-    // }
+    if (state == AppLifecycleState.resumed) {
+      debugPrint("current route: ${Get.currentRoute}");
+      if (!globalController.isBackFromSelectImages &&
+          (Get.currentRoute == "/" || Get.currentRoute == HomePage.routeName)) {
+        debugPrint('[App Open] show open ad');
+        appOpenAdController.showAppOpenAd();
+        globalController.addRequestReviewCounter();
+      }
+    }
   }
 
   Future<void> _pickImagesFromGallery() async {
+    globalController.isBackFromSelectImages = true;
     await fileController.pickMultipleImagesFromGallery(
       onPicked: (List<XFile> images) {
+        Future.delayed(const Duration(seconds: 3), () {
+          globalController.isBackFromSelectImages = false;
+        });
         if (images.isNotEmpty) {
+          debugPrint(
+              "begin to open exif preview page with images: ${images.length}");
+
           // Navigate to ExifPreviewPage with multiple images
           Get.toNamed(
             ExifPreviewPage.routeName,
@@ -125,7 +136,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _onWillPop() async {
-    if (globalController.requestRewardAdCounter >= 2 &&
+    if (globalController.requestReviewCounter >= 10 &&
         globalController.isLastShowReviewMoreThanOneMonth()) {
       if (await inAppReview.isAvailable()) {
         inAppReview.requestReview();
@@ -207,65 +218,80 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           },
           child: Column(
             children: [
-              // Welcome Section
               Expanded(
-                flex: 2,
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.photo_library,
-                        size: 80,
-                        color: Theme.of(context).appBarTheme.backgroundColor,
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'exif_editor'.tr,
-                        style: GoogleFonts.mPlusRounded1c(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 28,
-                          color: Theme.of(context).appBarTheme.backgroundColor,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'select_image_to_edit_exif'.tr,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton.icon(
-                          onPressed: () => _pickImagesFromGallery(),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).appBarTheme.backgroundColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                child: Column(
+                  children: [
+                    // Welcome Section
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.photo_library,
+                              size: 80,
+                              color:
+                                  Theme.of(context).appBarTheme.backgroundColor,
                             ),
-                            elevation: 4,
-                          ),
-                          icon: const Icon(Icons.add_photo_alternate, size: 24),
-                          label: Text(
-                            'select_multiple_images'.tr,
-                            style: GoogleFonts.mPlusRounded1c(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                            const SizedBox(height: 24),
+                            Text(
+                              'exif_editor'.tr,
+                              style: GoogleFonts.mPlusRounded1c(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 28,
+                                color: Theme.of(context)
+                                    .appBarTheme
+                                    .backgroundColor,
+                              ),
                             ),
-                          ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'select_image_to_edit_exif'.tr,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton.icon(
+                                onPressed: () => _pickImagesFromGallery(),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(context)
+                                      .appBarTheme
+                                      .backgroundColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 4,
+                                ),
+                                icon: const Icon(Icons.add_photo_alternate,
+                                    size: 24),
+                                label: Text(
+                                  'select_multiple_images'.tr,
+                                  style: GoogleFonts.mPlusRounded1c(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
+              const BannerAdmob(
+                adunitAndroid: 'ca-app-pub-4385164164114125/5843497114',
+                adunitIos: 'ca-app-pub-4385164164114125/9635989197',
               ),
             ],
           ),

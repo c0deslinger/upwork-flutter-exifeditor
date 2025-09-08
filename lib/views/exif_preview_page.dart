@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:drug_search/admob/banner_ad.dart';
+import 'package:drug_search/admob/native_ad.dart';
 import 'package:drug_search/exif_utils.dart';
 import 'package:drug_search/views/exif_info_page.dart';
 import 'package:drug_search/utils/album_saver.dart';
@@ -28,10 +31,16 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
   List<double> currentRotations = [];
   bool isLoading = true;
   Set<int> selectedIndices = {};
+  DateTime? loadingStartTime;
+  bool isDialogShowing = false;
+  bool hasInitialized = false;
 
   @override
   void initState() {
     super.initState();
+    // Record loading start time
+    loadingStartTime = DateTime.now();
+
     // Get the arguments from navigation
     final arguments = Get.arguments as Map<String, dynamic>?;
     if (arguments != null) {
@@ -46,6 +55,22 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
     } else {
       setState(() {
         isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Show loading dialog after dependencies are available
+    if (!hasInitialized &&
+        imagePaths.isNotEmpty &&
+        libraryType != null &&
+        isLoading) {
+      hasInitialized = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showLoadingDialog();
       });
     }
   }
@@ -88,14 +113,36 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
             .add(ExifUtils.getRotationAngle(detectedOrientationValue));
       }
 
+      // Ensure minimum loading time of 5 seconds
+      await _ensureMinimumLoadingTime();
+
+      _hideLoadingDialog();
       setState(() {
         isLoading = false;
       });
     } catch (e) {
+      // Ensure minimum loading time even on error
+      await _ensureMinimumLoadingTime();
+
+      _hideLoadingDialog();
       setState(() {
         isLoading = false;
       });
       debugPrint('Error loading EXIF data: $e');
+    }
+  }
+
+  Future<void> _ensureMinimumLoadingTime() async {
+    if (loadingStartTime != null) {
+      final elapsed = DateTime.now().difference(loadingStartTime!);
+      final minimumDuration = const Duration(seconds: 5);
+
+      if (elapsed < minimumDuration) {
+        final remainingTime = minimumDuration - elapsed;
+        debugPrint(
+            'Ensuring minimum loading time: ${remainingTime.inMilliseconds}ms remaining');
+        await Future.delayed(remainingTime);
+      }
     }
   }
 
@@ -160,15 +207,13 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
         ],
       ),
       body: SafeArea(
-        child: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : Column(
-                children: [
-                  // Grid of images
-                  Expanded(
-                    child: GridView.builder(
+        child: Column(
+          children: [
+            // Grid of images
+            Expanded(
+              child: imagePaths.length < 1 || exifDataList.isEmpty
+                  ? Container()
+                  : GridView.builder(
                       padding: const EdgeInsets.all(16),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
@@ -182,98 +227,205 @@ class _ExifPreviewPageState extends State<ExifPreviewPage> {
                         return _buildImageGridItem(index);
                       },
                     ),
-                  ),
+            ),
+            if (selectedIndices.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Column(
+                  children: [
+                    // // Current rotation info
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     Text(
+                    //       'Current Rotation:',
+                    //       style: GoogleFonts.mPlusRounded1c(
+                    //         fontWeight: FontWeight.bold,
+                    //         fontSize: 14,
+                    //       ),
+                    //     ),
+                    //     Text(
+                    //       '0.0°',
+                    //       style: TextStyle(
+                    //         fontSize: 14,
+                    //         color: Colors.grey.shade700,
+                    //         fontWeight: FontWeight.w500,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    // const SizedBox(height: 16),
 
-                  // Control panel for batch operations
-                  if (selectedIndices.isNotEmpty)
-                    Container(
-                      margin: const EdgeInsets.all(16),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: Column(
-                        children: [
-                          // // Current rotation info
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //   children: [
-                          //     Text(
-                          //       'Current Rotation:',
-                          //       style: GoogleFonts.mPlusRounded1c(
-                          //         fontWeight: FontWeight.bold,
-                          //         fontSize: 14,
-                          //       ),
-                          //     ),
-                          //     Text(
-                          //       '0.0°',
-                          //       style: TextStyle(
-                          //         fontSize: 14,
-                          //         color: Colors.grey.shade700,
-                          //         fontWeight: FontWeight.w500,
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
-                          // const SizedBox(height: 16),
-
-                          // Rotate button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: _rotateSelectedImages,
-                              icon: const Icon(Icons.rotate_right),
-                              label: Text(
-                                'rotate_clockwise'.tr,
-                                style: GoogleFonts.mPlusRounded1c(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
+                    // Rotate button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _rotateSelectedImages,
+                        icon: const Icon(Icons.rotate_right),
+                        label: Text(
+                          'rotate_clockwise'.tr,
+                          style: GoogleFonts.mPlusRounded1c(
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 12),
-
-                          // Save button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: _saveSelectedImages,
-                              icon: const Icon(Icons.save),
-                              label: Text(
-                                'save_images'.tr,
-                                style: GoogleFonts.mPlusRounded1c(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                ],
+                    const SizedBox(height: 12),
+
+                    // Save button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _saveSelectedImages,
+                        icon: const Icon(Icons.save),
+                        label: Text(
+                          'save_images'.tr,
+                          style: GoogleFonts.mPlusRounded1c(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+            const BannerAdmob(
+              adunitAndroid: 'ca-app-pub-4385164164114125/5843497114',
+              adunitIos: 'ca-app-pub-4385164164114125/9635989197',
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void _showLoadingDialog() {
+    if (isDialogShowing) return;
+
+    isDialogShowing = true;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromARGB(255, 179, 255, 228),
+                    Colors.white,
+                  ],
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Loading indicator
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    // decoration: BoxDecoration(
+                    //   color: Colors.white,
+                    //   borderRadius: BorderRadius.circular(15),
+                    //   boxShadow: [
+                    //     BoxShadow(
+                    //       color: Colors.black.withOpacity(0.1),
+                    //       blurRadius: 8,
+                    //       offset: const Offset(0, 4),
+                    //     ),
+                    //   ],
+                    // ),
+                    child: Column(
+                      children: [
+                        // Spinning loading indicator
+                        const SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 4,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Color.fromARGB(255, 26, 53, 21)),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Loading text
+                        Text(
+                          'loading_images'.tr,
+                          style: GoogleFonts.mPlusRounded1c(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+
+                        // Subtitle
+                        Text(
+                          'processing_exif_data'.tr,
+                          style: GoogleFonts.mPlusRounded1c(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Native Ad
+                  Container(
+                    constraints: const BoxConstraints(
+                      maxHeight: 300,
+                      maxWidth: 300,
+                    ),
+                    child: const NativeAdAdmob(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideLoadingDialog() {
+    if (isDialogShowing) {
+      isDialogShowing = false;
+      Navigator.of(context).pop();
+    }
   }
 
   Widget _buildImageGridItem(int index) {

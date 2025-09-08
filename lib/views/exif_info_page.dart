@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:drug_search/admob/banner_ad.dart';
 import 'package:drug_search/views/exif_editor_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -267,203 +268,215 @@ class _ExifInfoPageState extends State<ExifInfoPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header with filename
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
+            Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${'exif_info'.tr}: $fileName',
-                    style: GoogleFonts.mPlusRounded1c(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'exif_tags_found'
-                        .trParams({'count': exifData!.length.toString()}),
-                    style: const TextStyle(
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            Transform.rotate(
-              angle: (_getRotationAngle()) * 3.14159 / 180.0,
-              child: Transform.scale(
-                scaleX: _needsHorizontalMirror() ? -1.0 : 1.0,
-                scaleY: _needsVerticalMirror() ? -1.0 : 1.0,
-                child: Image.file(
-                  File(imagePath!),
-                  fit: BoxFit.cover,
-                  width: 200,
-                  height: 200,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Center(
-                      child: Icon(
-                        Icons.error,
-                        size: 30,
-                        color: Colors.red,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-
-            //thumbnail
-            GestureDetector(
-              onTap: () async {
-                Get.toNamed(ExifEditorPage.routeName, arguments: {
-                  'imagePath': imagePath,
-                  'orientation': orientation,
-                  'orientationValue': orientationValue,
-                  'originalFileName': originalFileName,
-                });
-              },
-              child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          File(imagePath!),
-                          fit: BoxFit.cover,
-                          width: 60,
-                          height: 60,
+                  // Header with filename
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${'exif_info'.tr}: $fileName',
+                          style: GoogleFonts.mPlusRounded1c(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
                         ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'exif_tags_found'
+                              .trParams({'count': exifData!.length.toString()}),
+                          style: const TextStyle(
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Transform.rotate(
+                    angle: (_getRotationAngle()) * 3.14159 / 180.0,
+                    child: Transform.scale(
+                      scaleX: _needsHorizontalMirror() ? -1.0 : 1.0,
+                      scaleY: _needsVerticalMirror() ? -1.0 : 1.0,
+                      child: Image.file(
+                        File(imagePath!),
+                        fit: BoxFit.cover,
+                        width: 200,
+                        height: 200,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(
+                              Icons.error,
+                              size: 30,
+                              color: Colors.red,
+                            ),
+                          );
+                        },
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                  ),
+
+                  //thumbnail
+                  GestureDetector(
+                    onTap: () async {
+                      Get.toNamed(ExifEditorPage.routeName, arguments: {
+                        'imagePath': imagePath,
+                        'orientation': orientation,
+                        'orientationValue': orientationValue,
+                        'originalFileName': originalFileName,
+                      });
+                    },
+                    child: Container(
+                        width: double.infinity,
+                        margin:
+                            const EdgeInsets.only(left: 16, right: 16, top: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
                           children: [
-                            Text(
-                              'thumbnail'.tr,
-                              style: GoogleFonts.mPlusRounded1c(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                                color: Colors.black,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                File(imagePath!),
+                                fit: BoxFit.cover,
+                                width: 60,
+                                height: 60,
                               ),
                             ),
-                            Text(
-                              'orientation: $orientation'.tr,
-                              style: GoogleFonts.mPlusRounded1c(
-                                fontSize: 14,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              'rotation: ${_getRotationAngle()}°'.tr,
-                              style: GoogleFonts.mPlusRounded1c(
-                                fontSize: 12,
-                                color: Colors.black,
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'thumbnail'.tr,
+                                    style: GoogleFonts.mPlusRounded1c(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    'orientation: $orientation'.tr,
+                                    style: GoogleFonts.mPlusRounded1c(
+                                      fontSize: 14,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    'rotation: ${_getRotationAngle()}°'.tr,
+                                    style: GoogleFonts.mPlusRounded1c(
+                                      fontSize: 12,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                    ],
-                  )),
-            ),
+                        )),
+                  ),
 
-            const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-            // Thumbnail and main content
-            Expanded(
-              child: Row(
-                children: [
-                  // EXIF data sections
+                  // Thumbnail and main content
                   Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: groupedData.entries.map((categoryEntry) {
-                        String category = categoryEntry.key;
-                        List<MapEntry<String, dynamic>> entries =
-                            categoryEntry.value;
+                    child: Row(
+                      children: [
+                        // EXIF data sections
+                        Expanded(
+                          child: ListView(
+                            padding: const EdgeInsets.all(16),
+                            children: groupedData.entries.map((categoryEntry) {
+                              String category = categoryEntry.key;
+                              List<MapEntry<String, dynamic>> entries =
+                                  categoryEntry.value;
 
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 24),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Category header
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  category.toLowerCase().tr,
-                                  style: GoogleFonts.mPlusRounded1c(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-
-                              // EXIF entries
-                              ...entries.map((entry) {
-                                return Container(
-                                  margin: const EdgeInsets.only(bottom: 4),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Key
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          _formatExifKey(entry.key),
-                                          style: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 24),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Category header
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        category.toLowerCase().tr,
+                                        style: GoogleFonts.mPlusRounded1c(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                          color: Colors.white,
                                         ),
                                       ),
-                                      const SizedBox(width: 16),
-                                      // Value
-                                      Expanded(
-                                        flex: 3,
-                                        child: Text(
-                                          _formatExifValue(entry.value),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                          ),
+                                    ),
+                                    const SizedBox(height: 8),
+
+                                    // EXIF entries
+                                    ...entries.map((entry) {
+                                      return Container(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 4),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Key
+                                            Expanded(
+                                              flex: 2,
+                                              child: Text(
+                                                _formatExifKey(entry.key),
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            // Value
+                                            Expanded(
+                                              flex: 3,
+                                              child: Text(
+                                                _formatExifValue(entry.value),
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                            ],
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
                           ),
-                        );
-                      }).toList(),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
+            ),
+            const BannerAdmob(
+              adunitAndroid: 'ca-app-pub-4385164164114125/5843497114',
+              adunitIos: 'ca-app-pub-4385164164114125/9635989197',
             ),
           ],
         ),

@@ -232,4 +232,12 @@ Write to start""",
   "exif_version": "EXIF Version",
   "exposure_mode": "Exposure Mode",
   "focal_len_in35mm_film": "Focal Length in 35mm Film",
+  "loading_images": "Loading Images",
+  "processing_exif_data": "Processing EXIF Data",
+  "delete_confirmation_title": "Delete Images?",
+  "delete_confirmation_desc":
+      "Are you sure you want to delete the selected image? This action cannot be undone.",
+  "delete_confirmation_delete": "Delete",
+  "delete_confirmation_cancel": "Cancel",
+  "imagerotator_3_1m_0": "Monthly-\$2.99/Month",
 };

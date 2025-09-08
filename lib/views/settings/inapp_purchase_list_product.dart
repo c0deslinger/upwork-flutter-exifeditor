@@ -20,7 +20,7 @@ class InAppPurchasePage extends StatelessWidget {
       } else {
         return Column(
           children: [
-            _buildProductList(),
+            // _buildProductList(),
             buildUpgradeButton(),
             buildRestoreButton(onNothingToRestore: () {
               showNothingToRestoreError(context);

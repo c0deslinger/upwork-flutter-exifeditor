@@ -22,6 +22,8 @@ class GlobalController extends GetxController {
   String? savedZip;
   final box = GetStorage();
   String? savedPath;
+  int requestReviewCounter = 0;
+  bool isBackFromSelectImages = false;
 
   @override
   void onInit() {
@@ -99,6 +101,7 @@ class GlobalController extends GetxController {
     bool? storedIsVertical = prefs.getBool("isVertical");
     String? storedCurrency = prefs.getString("currency");
     isFirstTimeOpen = prefs.getBool("isFirstTimeOpen") ?? true;
+    requestReviewCounter = prefs.getInt("requestReviewCounter") ?? 0;
 
     // Set nilai-nilai GlobalController
     locale = Locale(storedLangCode ?? (isDeviceUseJapan ? "ja" : "en"));
@@ -251,5 +254,12 @@ class GlobalController extends GetxController {
     savedPath = box.read("savedPath");
     update();
     return savedPath;
+  }
+
+  void addRequestReviewCounter() async {
+    requestReviewCounter++;
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt("requestReviewCounter", requestReviewCounter);
+    update();
   }
 }

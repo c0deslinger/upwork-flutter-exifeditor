@@ -160,11 +160,10 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ),
             ),
-            if (!globalController.isFirstTimeOpen)
-              const BannerAdmob(
-                adunitAndroid: 'ca-app-pub-4385164164114125/4353852639',
-                adunitIos: 'ca-app-pub-4385164164114125/2306273796',
-              ),
+            const BannerAdmob(
+              adunitAndroid: 'ca-app-pub-4385164164114125/5843497114',
+              adunitIos: 'ca-app-pub-4385164164114125/9635989197',
+            ),
           ],
         ),
       ),
